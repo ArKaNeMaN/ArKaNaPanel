@@ -1,0 +1,52 @@
+<?php
+	if(empty($_GET['module']) || !$this->isModuleInstalled($_GET['module'])) $this->error = '404';
+	$moduleInfo = $this->getModuleInfo($_GET['module']);
+	if(!$moduleInfo['settPage'] || !$moduleInfo['settTpl']) $this->error = '404';
+	$this->checkAccess(1);
+	if(!($tpl = $this->getModuleSettTpl($_GET['module']))) $this->error = '404';
+	$this->title = $moduleInfo['name'].' | Настройки';
+?>
+
+<h2>Настройки модуля "<?php echo $moduleInfo['name']?> [<?php echo $moduleInfo['version']?>]"</h2>
+
+<script src="<?php echo PANEL_HOME?>public/js/modulesSettsTpl.js" defer></script>
+
+<script>window.tplSets = []; window.tplModule = '<?php echo $_GET['module'];?>';</script>
+
+<table id="tplSettsCont">
+	<?php for($i = 0; $i < count($tpl); $i++):?>
+		<tr><td colspan="2" style="text-align: center;"><?php echo $tpl[$i]['name'];?></td></tr>
+		<?php for($k = 0; $k < count($tpl[$i]['items']); $k++):?>
+			<script>window.tplSets.push({id: '<?php echo $tpl[$i]['items'][$k]['id'];?>', type: '<?php echo $tpl[$i]['items'][$k]['type'];?>'});</script>
+			<tr>
+				<td><?php echo $tpl[$i]['items'][$k]['name'];?></td>
+				<td>
+					<?php if($tpl[$i]['items'][$k]['type'] != 'custom'):?>
+						<input 
+							type="<?php echo $tpl[$i]['items'][$k]['type'];?>" 
+							class="w100 <?php echo $tpl[$i]['items'][$k]['type'] == 'checkbox' ? 'lc-switch' : 'styler';?>" 
+							<?php if(isset($this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']])):?>
+								<?php if($tpl[$i]['items'][$k]['type'] == 'checkbox'):?>
+									<?php echo $this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']] ? 'checked' : '';?> 
+								<?php else:?>
+									value="<?php echo $this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']];?>" 
+								<?php endif;?>
+							<?php endif;?>
+							<?php if($tpl[$i]['items'][$k]['type'] != 'checkbox'):?>
+								placeholder="<?php echo $tpl[$i]['items'][$k]['placeholder'];?>" 
+							<?php endif;?>
+							id="adminTpl<?php echo $tpl[$i]['items'][$k]['id'];?>" 
+						/>
+					<?php else:?>
+						<?php
+							if(!isset($tpl[$i]['items'][$k]['customFile'])) echo 'Путь до файла кастомной настройки не указан';
+							else if(file_exists($tpl[$i]['items'][$k]['customFile'])) require $this->homePath.$tpl[$i]['items'][$k]['customFile'];
+							else echo 'Файл кастомной настройки не найден';
+						?>
+					<?php endif;?>
+				</td>
+			</tr>
+		<?php endfor;?>
+	<?php endfor;?>
+	<tr><td colspan="2"><div align=center><button onclick="saveTplSettings()" class="styler">Сохранить</button></div></td></tr>
+</table>

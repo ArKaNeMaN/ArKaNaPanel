@@ -1,0 +1,10 @@
+<?
+	$this->userLogout($_POST['path']);
+	/* if(isset($_SESSION['logoutRedir'])){
+		sleep(3);
+		$this->redirect($_SESSION['logoutRedir']);
+		unset($_SESSION['logoutRedir']);
+		die;
+	}
+	$_SESSION['logoutRedir'] = $_POST['path'];
+	$this->redirect($_POST['path']); */

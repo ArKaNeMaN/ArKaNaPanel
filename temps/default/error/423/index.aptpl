@@ -1,0 +1,5 @@
+<?$this->title = 'Error 423'?>
+<div align=center style="text-align: center; padding-bottom: 20px;">
+	<h1>Error 423</h1>
+	<div>Locked</div>
+</div>

@@ -1,0 +1,12 @@
+.profileAvatar{
+	width: 200px;
+	height: 200px;
+	object-fit: cover;
+	border-radius: 200px;
+}
+
+.profileInfoBlock{
+	width: 720px;
+	float: right;
+	padding-left: 20px;
+}

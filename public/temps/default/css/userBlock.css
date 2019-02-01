@@ -1,0 +1,71 @@
+.userBlock{
+	width: 420px;
+	height: 150px;
+	border-radius: 5px;
+	background: rgba(20, 20, 20, .7);
+	float: right;
+	color: white;
+	padding: 7px 17px 20px 17px;
+	overflow: hidden;
+}
+
+.userBlock .userName{
+	width: 100%;
+	text-align: center;
+	height: 20px;
+}
+
+.userBlock .userAvatar{
+	float: left;
+	height: 100px;
+	width: 100px;
+	border-radius: 60px;
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	border: 3px solid Green;
+	-webkit-box-shadow: 0px 0px 30px 2px rgba(0, 255, 0, .7);
+	-moz-box-shadow: 0px 0px 30px 2px rgba(0, 25, 0, .7);
+	box-shadow: 0px 0px 30px 2px rgba(0, 255, 0, .7);
+	padding: auto;
+}
+
+.userBlock ul.userMenu{
+	padding-left: 20px;
+	float: left;
+}
+
+.userBlock ul.userMenu li a{
+	text-decoration: none;
+	color: inherit;
+}
+
+.userBlock ul.userMenu li{
+	padding: 2px 0;
+}
+
+.userBlock ul.userMenu li a:hover{
+	color: yellow;
+}
+
+.userBlock .userBalans{
+	float: right;
+	text-align: left;
+	width: 110px;
+	height: 80px;
+	margin-right: 5px;
+	padding: 10px;
+	font-weight: bold;
+	font-size: 85%;
+}
+
+.userBlock .userBalans .userBalansTitle{
+	width: 100%;
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.authBlockCont input{
+	width: 90%;
+	margin-bottom: 8px;
+}

@@ -1,0 +1,41 @@
+<?$this->checkAccess(1);?>
+<?$this->title = 'Настройка панели';?>
+
+<script src="<?php echo PANEL_HOME;?>public/js/adminMain.js"></script>
+
+<h2>Настройка панели</h2>
+
+<table id="adminMainPanel">
+	<tr><td colspan="2" style="text-align: center;">Основное</td></tr>
+	<tr>
+		<td style="width: auto;">Название сайта</td>
+		<td><input class="styler w100" type="text" placeholder="Название сайта" id="adminMainSiteName" value="<?=$this->settings['core']['siteName']?>"></td>
+	</tr>
+	<tr>
+		<td style="width: auto;">Начальная страница</td>
+		<td><input class="styler w100" type="text" placeholder="Начальная страница" id="adminMainHomePage" value="<?=$this->settings['core']['homePage']?>"></td>
+	</tr>
+	<tr>
+		<td style="width: auto;">Сжимать аватарки?</td>
+		<td><input class="lc-switch" type="checkbox" id="adminMainZipAvatars" <?php echo $this->settings['core']['zipAvatars'] ? 'checked' : ''?>></td>
+	</tr>
+	<tr><td colspan="2" style="text-align: center;">Метрика</td></tr>
+	<tr>
+		<td style="width: auto;">Номер счётчика Яндекс.Метрики</td>
+		<td><input class="styler w100" type="number" placeholder="Отсавьте пустым, чтобы отключить" id="adminMainYaMetrika" value="<?=$this->settings['core']['yaMetrika']?>"></td>
+	</tr>
+	<tr>
+		<td style="width: auto;">ID отслеживания Google Аналитики</td>
+		<td><input class="styler w100" type="text" placeholder="Отсавьте пустым, чтобы отключить" id="adminMainGoogleAnalytics" value="<?=$this->settings['core']['googleAnalytics']?>"></td>
+	</tr>
+	<tr><td colspan="2" style="text-align: center;">Капча (ReCAPTCHA v2 Invisible)</td></tr>
+	<tr>
+		<td style="width: auto;">ReCAPTCHA (Публичный ключ)</td>
+		<td><input class="styler w100" type="text" placeholder="Публичный ключ капчи" id="adminMainCaptchaPubKey" value="<?php echo $this->settings['core']['captchaPubKey'];?>"></td>
+	</tr>
+	<tr>
+		<td style="width: auto;">ReCAPTCHA (Секретный ключ)</td>
+		<td><input class="styler w100" type="text" placeholder="Секретный ключ капчи" id="adminMainCaptchaSecKey" value="<?php echo $this->settings['core']['captchaSecKey'];?>"></td>
+	</tr>
+	<tr><td colspan="2"><div align=center><button class="styler" id="adminMainSaveBtn">Сохранить</button></div></td></tr>
+</table>

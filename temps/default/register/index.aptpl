@@ -1,0 +1,39 @@
+<?$this->title = 'Регистрация';?>
+
+<?if(empty($this->userid)):?>
+<div id="regForm">
+	<script src="/public/js/register.js" defer></script>
+	
+	<h2>Регистрация</h2>
+	
+	<label>Логин</label>
+	<input class="styler w100" style="margin-bottom: 15px;" type="text" placeholder="Логин" id="userRegLogin" required />
+	
+	<label>Ник в игре (Можно будет менять в настройках)</label>
+	<input class="styler w100" style="margin-bottom: 15px;" type="text" placeholder="Игровой ник" id="userRegName" required />
+	
+	<label>Пароль</label>
+	<input class="styler w100" style="margin-bottom: 15px;" type="password" placeholder="Пароль" id="userRegPass" required />
+	
+	<label>Подтверждение пароля</label>
+	<input class="styler w100" style="margin-bottom: 15px;" type="password" placeholder="Пароль" id="userRegPassa" required />
+	
+	<label>Электронная почта (Необязательно)</label>
+	<input class="styler w100" style="margin-bottom: 15px;" type="email" placeholder="Электронная почта" id="userRegEmail" />
+	
+	
+	<button id="userRegBtnReg" class="styler 
+	<?php if($this->settings['core']['captchaPubKey'] && $this->settings['core']['captchaSecKey']):?>
+		g-recaptcha"
+		data-sitekey="<?php echo $this->settings['core']['captchaPubKey'];?>"
+		data-callback="regSendForm"
+	<?php else:?>
+		"
+		onclick="regSendForm()"
+	<?php endif;?>
+	>Регистрация</button>
+	<button class="styler" id="userRegBtnCheck">Проверить введённые данные</button>
+</div>
+<?else:?>
+	<h2>Вы уже зарегистрированы</h2>
+<?endif?>

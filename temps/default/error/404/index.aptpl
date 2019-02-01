@@ -1,0 +1,5 @@
+<?$this->title = 'Error 404'?>
+<div align=center style="text-align: center; padding-bottom: 20px;">
+	<h1>Error 404</h1>
+	<div>Page not found</div>
+</div>

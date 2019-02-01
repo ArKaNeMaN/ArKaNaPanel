@@ -1,0 +1,46 @@
+<?
+	$this->checkAccess(1);
+	
+	$this->title = "Настройка меню";
+	
+	$items = $this->getMenuItems(false);
+?>
+
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/draggable.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/sortable.js"></script>
+
+<script>
+	window.userGroups = JSON.parse('<?=json_encode($this->getUserGroups());?>');
+</script>
+
+<script src="<?php echo PANEL_HOME;?>public/js/adminMenu.js"></script>
+<link href="<?php echo PANEL_HOME;?>public/temps/<?=PANEL_THEME?>/css/adminMenu.css" rel="stylesheet"/>
+
+<div id="menuModal" class="modal-custom"></div>
+
+<button onclick="clickAddMenuItem(); return false;" style="float: right; font-weight: bold;" class="styler"><i class="fa fa-plus"></i> Добавить пункт</button>
+<h2>Настрйока меню <button onclick="reloadMenuItemsList(); return false;" class="styler"><i class="fa fa-sync-alt"></i></button></h2>
+
+<ul class="adminMenu">
+	<?for($i = 0; $i < count($items); $i++):?>
+		<li onclick="adminMenuEdit(<?=$items[$i]['id']?>); return false;">
+			<span style="margin-right: 10px;"><?=$items[$i]['id']?></span>
+			<span><?=($items[$i]['active'] == 1 ? '<i title="Активен" class="fa fa-power-off menuActive"></i>' : '<i title="Неактивен" class="fa fa-power-off menuInactive"></i>')?></span>
+			<span style="margin-right: 5px; font-weight: bold;"><?=$items[$i]['name']?></span>
+			<span><?=$items[$i]['link'] == '' ? '' : '('.$items[$i]['link'].')'?></span>
+			<?if($items[$i]['submenu']):?>
+				<ul>
+					<?for($k = 0; $k < count($items[$i]['submenu']); $k++):?>
+						<li onclick="adminMenuEdit(<?=$items[$i]['submenu'][$k]['id']?>); return false;">
+							<i class="fa fa-caret-right" style="margin-right: 10px;"></i>
+							<span style="margin-right: 10px;"><?=$items[$i]['submenu'][$k]['id']?></span>
+							<span><?=($items[$i]['submenu'][$k]['active'] == 1 ? '<i title="Активен" class="fa fa-power-off menuActive"></i>' : '<i title="Неактивен" class="fa fa-power-off menuInactive"></i>')?></span>
+							<span style="margin-right: 5px; font-weight: bold;"><?=$items[$i]['submenu'][$k]['name']?></span>
+							<span><?=$items[$i]['submenu'][$k]['link'] == '' ? '' : '('.$items[$i]['submenu'][$k]['link'].')'?></span>
+						</li>
+					<?endfor;?>
+				</ul>
+			<?endif;?>
+		</li>
+	<?endfor;?>
+</ul>

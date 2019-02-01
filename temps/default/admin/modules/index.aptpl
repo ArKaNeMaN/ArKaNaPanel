@@ -1,0 +1,47 @@
+<?$this->checkAccess(1);?>
+<?$this->title = 'Менеджер модулей';?>
+
+<script src="<?php echo PANEL_HOME;?>public/js/modules.js" defer></script>
+
+<h2>Менеджер модулей</h2>
+
+<?$modules = $this->getModulesAdmins();?>
+
+<?if(!empty($modules) && is_array($modules)):?>
+	<table style="width: 100%;">
+		<thead>
+			<th>Название</th>
+			<th>Версия</th>
+			<th>Автор</th>
+			<th>Настройки</th>
+			<th>Действия</th>
+		</thead>
+		<tbody>
+			<?for($i = 0; $i < count($modules); $i++):?>
+				<tr id="modulesAdminItem-<?=$modules[$i]['id']?>">
+					<td><?=$modules[$i]['name']?></td>
+					<td><?=$modules[$i]['version']?></td>
+					<td><?=$modules[$i]['author']?></td>
+					<td>
+						<?if($modules[$i]['settLink']):?>
+							<a href="<?=$modules[$i]['settLink']?>"><button class="styler">Настройки</button></a>
+						<?else:?>
+							Нету
+						<?endif;?>
+					</td>
+					<td>
+						<?if(!$modules[$i]['installed']):?>
+							<button title="Установить" id="modulesAdminActBtn" onclick="moduleAdminSendRequest('install', '<?=$modules[$i]['id']?>')" class="styler"><i class="fa fa-download"></i></button>
+						<?elseif($modules[$i]['active']):?>
+							<button title="Деактивировать" id="modulesAdminActBtn" onclick="moduleAdminSendRequest('deactivate', '<?=$modules[$i]['id']?>')" class="styler"><i class="fa fa-power-off" style="color: green"></i></button>
+						<?else:?>
+							<button title="Активировать" id="modulesAdminActBtn" onclick="moduleAdminSendRequest('activate', '<?=$modules[$i]['id']?>')" class="styler"><i class="fa fa-power-off" style="color: red"></i></button>
+						<?endif;?>
+					</td>
+				</tr>
+			<?endfor;?>
+		</tbody>
+	</table>
+<?else:?>
+	Модули не найдены
+<?endif;?>

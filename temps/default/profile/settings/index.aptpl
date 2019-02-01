@@ -1,0 +1,51 @@
+<?php $this->title='Настройки профиля';?>
+
+<?php if(!$this->userid) $this->error = '403';?>
+
+<script src="<?php echo PANEL_HOME?>public/js/userSettings.js" defer></script>
+
+<h2>Настройки профиля</h2>
+
+<table id="userSettingsCont">
+	<tr><td colspan="2" style="text-align: center;">Основное</td></tr>
+	<tr>
+		<td>Аватарка</td>
+		<td>
+			<img id="userSettingsAvatarPrev" style="height: 34px; width: 34px; object-fit: cover; border-radius: 50px;" src="<?php echo PANEL_HOME.$this->userInfo['avatar']?>" />
+			<input class="styler" type="file" accept="image/jpeg,image/png" id="userSettingsAvatarInp"/>
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>
+			<button class="styler" onclick="sendAvatarForm(); return false;">Загрузить</button>
+		</td>
+	</tr>
+	<tr>
+		<td>Логин</td>
+		<td><input class="styler w100" type="text" value="<?php echo $this->userInfo['login'];?>" disabled title="Логин нельзя изменить" /></td>
+	</tr>
+	<tr>
+		<td>Ник</td>
+		<td><input class="styler w100" type="text" id="userSettingsNameInp" placeholder="Введите ник" value="<?php echo $this->userInfo['name'];?>" /></td>
+	</tr>
+	<tr>
+		<td colspan="2"><div align=center><button class="styler" onclick="sendSaveMain(); return false;">Сохранить</button></div></td>
+	</tr>
+	<tr><td colspan="2" style="text-align: center;">Смена пароля</td></tr>
+	<tr>
+		<td>Старый пароль</td>
+		<td><input class="styler w100" type="password" id="userSettingsOldPassInp" placeholder="Введите старый пароль" /></td>
+	</tr>
+	<tr>
+		<td>Новый пароль</td>
+		<td><input class="styler w100" type="password" id="userSettingsNewPassInp" placeholder="Введите новый пароль" /></td>
+	</tr>
+	<tr>
+		<td>Подтверждение нового пароля</td>
+		<td><input class="styler w100" type="password" id="userSettingsNewPassaInp" placeholder="Введите новый пароль ещё раз" /></td>
+	</tr>
+	<tr>
+		<td colspan="2"><div align=center><button class="styler" onclick="sendChangePass(); return false;">Сменить</button></div></td>
+	</tr>
+</table>

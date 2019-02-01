@@ -1,0 +1,39 @@
+/*Меню*/
+
+ul.adminMenu{
+	border-top: 1px solid rgba(20, 20, 20, .5);
+	user-select: none;
+}
+
+ul.adminMenu li{
+	padding: 10px 25px;
+	border-bottom: 1px solid rgba(20, 20, 20, .5);
+	cursor: pointer;
+}
+
+ul.adminMenu li ul{
+	margin-top: 5px;
+	padding-left: 30px;
+}
+
+ul.adminMenu li ul:before{
+	content: "Подпункты:";
+}
+
+ul.adminMenu li ul li{
+	padding: 10px 25px;
+	border-bottom: 1px solid rgba(20, 20, 20, .5);
+	cursor: pointer;
+}
+
+ul.adminMenu li:hover, ul.adminMenu li ul li:hover{
+	background-color: rgba(255, 255, 255, .1);
+}
+
+i.menuActive{
+	color: green;
+}
+
+i.menuInactive{
+	color: red;
+}

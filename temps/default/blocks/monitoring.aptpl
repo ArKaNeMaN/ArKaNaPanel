@@ -1,0 +1,39 @@
+<div class="blockCont">
+	<link href="public/temps/<?=PANEL_THEME?>/css/monitoring.css" rel="stylesheet" />
+	<div class="blockHead">Мониторинг</div>
+	<div class="blockBody">
+		<table class="monitorTable">
+			<thead>
+				<th>Игра</th>
+				<th>Название</th>
+				<th>Адрес</th>
+				<th>Карта</th>
+				<th>Онлайн</th>
+			</thead>
+			<tbody>
+				<tr>
+					<td>CS1.6</td>
+					<td>.::ArKaNaWorld.ru::. |CSDM| ッ</td>
+					<td>46.173.218.202:27015</td>
+					<td>de_dust2_2x2_css</td>
+					<td><progress value="12" max="32"></progress></td>
+				</tr>
+				<tr>
+					<td>CS1.6</td>
+					<td>.::ArKaNaWorld.ru::. |CSDM| ッ</td>
+					<td>46.173.218.202:27015</td>
+					<td>de_dust2_2x2_css</td>
+					<td><progress value="2" max="32"></progress></td>
+				</tr>
+				<tr>
+					<td>CS1.6</td>
+					<td>.::ArKaNaWorld.ru::. |CSDM| ッ</td>
+					<td>46.173.218.202:27015</td>
+					<td>de_dust2_2x2_css</td>
+					<td><progress value="25" max="32"></progress></td>
+				</tr>
+			</tbody>
+		</table>
+		<progress style="width: 100%; margin-top: 10px;" value="39" max="96"></progress>
+	</div>
+</div>

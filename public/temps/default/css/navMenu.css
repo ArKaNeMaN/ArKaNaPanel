@@ -1,0 +1,68 @@
+.navMenu{
+	height: 40px;
+	width: 100%;
+	border-bottom: 2px solid #1c1c1c;
+	margin: 0;
+}
+
+.navMenu > li{
+	display: inline-block;
+	float: left;
+	/* margin: 0 0 1px 0; */
+}
+
+.navMenu > li > a {
+	outline: medium none;
+	display: block;
+	height: 40px;
+	padding: 0px 15px 0px 15px;
+	line-height: 40px;
+	text-decoration: none;
+	font-size: 90%;
+	color: inherit;
+	background: rgb(97,137,191);
+	background: -moz-linear-gradient(0deg, rgba(97,137,191,0.9248074229691877) 3%, rgba(255,255,255,0) 50%);
+	background: -webkit-linear-gradient(0deg, rgba(97,137,191,0.9248074229691877) 3%, rgba(255,255,255,0) 50%);
+	background: linear-gradient(0deg, rgba(97,137,191,0.9248074229691877) 3%, rgba(255,255,255,0) 50%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#6189bf",endColorstr="#ffffff",GradientType=1);
+}
+
+.navMenu > li > a:hover {
+	background: rgb(97,137,191);
+	background: -moz-linear-gradient(0deg, rgba(97,137,191,0.9248074229691877) 3%, rgba(255,255,255,0) 100%);
+	background: -webkit-linear-gradient(0deg, rgba(97,137,191,0.9248074229691877) 3%, rgba(255,255,255,0) 100%);
+	background: linear-gradient(0deg, rgba(97,137,191,0.9248074229691877) 3%, rgba(255,255,255,0) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#6189bf",endColorstr="#ffffff",GradientType=1);
+}
+
+.navMenu > li > a:active {
+	background: rgb(97,137,191);
+	background: -moz-linear-gradient(0deg, rgba(97,137,191,1) 3%, rgba(255,255,255,0) 100%);
+	background: -webkit-linear-gradient(0deg, rgba(97,137,191,1) 3%, rgba(255,255,255,0) 100%);
+	background: linear-gradient(0deg, rgba(80,130,180,1) 3%, rgba(255,255,255,0) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#6189bf",endColorstr="#ffffff",GradientType=1);
+}
+
+.navMenu > li > ul{
+	margin-top: 0!important;
+}
+
+.navMenu > li > ul > li > a {
+	outline: medium none;
+	display: block;
+	height: 40px;
+	padding: 0px 15px 0px 15px;
+	line-height: 40px;
+	text-decoration: none;
+	font-size: 90%;
+	color: inherit;
+	background: rgb(97,137,191);
+}
+
+.navMenu > li > ul > li > a:hover {
+	background: rgb(77,117,171);
+}
+
+.navMenu > li > ul > li > a:active {
+	background: rgb(57,97,151);
+}
