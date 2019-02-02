@@ -1,0 +1,54 @@
+[
+	{
+		"name": "Настройки БД",
+		"items": [
+			{
+				"id": "sqlHost",
+				"name": "Хост",
+				"type": "text",
+				"placeholder": "Введите хост БД"
+			},
+			{
+				"id": "sqlHost",
+				"name": "Пользователь",
+				"type": "text",
+				"placeholder": "Введите имя пользователя БД"
+			},
+			{
+				"id": "sqlPass",
+				"name": "Пароль",
+				"type": "password",
+				"placeholder": "Введите пароль юзера БД"
+			},
+			{
+				"id": "sqlDb",
+				"name": "Название БД",
+				"type": "text",
+				"placeholder": "Введите название БД"
+			},
+			{
+				"id": "sqlPrefix",
+				"name": "Префикс таблицы",
+				"type": "text",
+				"placeholder": "Введите название таблицы"
+			},
+			{
+				"id": "sqlEncode",
+				"name": "Кодирока",
+				"type": "text",
+				"placeholder": "Введите кодировку таблицы"
+			}
+		]
+	},
+	{
+		"name": "Другое",
+		"items": [
+			{
+				"id": "pageItems",
+				"name": "Кол-во элементов на странице",
+				"type": "number",
+				"placeholder": "Укажите кол-во элментов на странице"
+			}
+		]
+	}
+]
