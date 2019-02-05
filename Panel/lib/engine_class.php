@@ -1,22 +1,22 @@
 <?php
 	class engine{
 		
-		private $isRequest = false;
+		private $isRequest = false; // true если класс объявлен в реквесте (Указывается вручную при объявлении класса)
 		
-		protected $pageContent;
-		protected $error = '';
+		protected $pageContent; // Содержимое страницы
 		
-		public $homePath = '';
-		public $userid;
-		public $sql;
-		public $userInfo;
-		public $modules;
-		public $settings;
-		public $title = '';
+		public $error = ''; // Код ошибки
+		public $homePath = ''; // Корневая папка панели (Используется для инклюда)
+		public $userid; // ID авторизованного пользователя (Для гостей null)
+		public $sql; // Объект класса для работы с БД
+		public $userInfo; // Информация об авторизованном пользователе (Для гостей false)
+		public $modules; // Массив с объектами классов всех подгруженным модулей
+		public $settings; // Настройки
+		public $title = ''; // Заголовок страницы (Обычно присваивается в начале кода страницы)
 		
 		//--------------------| Конструктор |--------------------//
 		
-		public function __construct($req = false){
+		public function __construct($req = false){ // Конструктор класса
 			session_start();
 			ini_set('display_errors', 0);
 			error_reporting(E_ALL);
@@ -33,6 +33,9 @@
 			/* $this->mysqli = new mysqli(SQL_HOST, SQL_USER, SQL_PASS, SQL_DB);
 			$this->mysqli->query('SET NAMES UTF8'); */
 			
+			$this->modules['engine'] = &$this;
+			$this->modules['core'] = &$this;
+			
 			$this->settings = $this->getSettings();
 			$this->checkAuth();
 			$this->loadModules();
@@ -40,7 +43,7 @@
 		
 		//--------------------| Получение контента |--------------------//
 		
-		public function loadContent(){
+		public function loadContent(){ // Загрузка страницы
 			$link = parse_url($_SERVER['REQUEST_URI']);
 			$path = explode('/', str_replace(PANEL_DIR, '', $link['path']));
 			$defCont = isset($this->settings['core']['homePage']) ? $this->settings['core']['homePage'] : 'home';
@@ -62,19 +65,25 @@
 			echo $this->getTpl('main');
 		}
 		
-		protected function getTpl($content){
+		protected function getTpl($content){ // Получение содержимого страницы
 			$content = file_exists('temps/'.PANEL_THEME.'/'.$content.'.aptpl') ? 'temps/'.PANEL_THEME.'/'.$content.'.aptpl' : 'temps/'.PANEL_THEME.'/'.$content.'/index.aptpl';
 			ob_start(); 				 
 			include($content);
 			return ob_get_clean();
 		}
 		
-		public function incBlock($name){
-			$fullName = 'temps/'.PANEL_THEME.'/blocks/'.$name.'.aptpl';
+		protected function getTplThemePath($path){
+			$path_ = 'temps/'.PANEL_THEME.'/'.$path;
+			if(file_exists($path_)) return $path_;
+			else return 'temps/default/'.$path;
+		}
+		
+		public function incBlock($name){ // Добавление блока на страницу
+			$fullName = 'temps/'.PANEL_THEME.'/blocks/'.$name.'/block.aptpl';
 			if(file_exists($fullName)) include($fullName);
 		}
 		
-		public function loadJsPlugin($name, $inputDir = false){
+		public function loadJsPlugin($name, $inputDir = false){ // Добавление JS плагина на страницу
 			$dir = $inputDir ? 'public/plugins/'.$name.'/' : $name;
 			if(is_dir($dir)){
 				if($dh = opendir($dir)){
@@ -87,7 +96,7 @@
 			}
 		}
 		
-		public function loadAllJsPlugins(){
+		public function loadAllJsPlugins(){ // Добавление всех JS плагинов на страницу
 			$dir = 'public/plugins/';
 			if(is_dir($dir)){
 				if($dh = opendir($dir)){
@@ -100,7 +109,7 @@
 			
 		}
 		
-		public function checkAccess($group, $return = false){
+		public function checkAccess($group, $return = false){ // Проверка доступа пользователя
 			$r = false;
 			if($this->userid){
 				if(is_array($group)) $r = (bool) (in_array($this->userInfo['group'], $group));
@@ -110,9 +119,49 @@
 			else return $r;
 		}
 		
+		//--------------------| Манагер блоков |--------------------//
+		
+		public function getAdminBlocks(){
+			$path = $this->homePath.'temps/default/blocks';
+			if(file_exists($path) && is_dir($path)){
+				$result = scandir($path);
+				$files = array_diff($result, array('.', '..'));
+				if(count($files) > 0){
+					foreach($files as $file){
+						if(is_dir("$path/$file")){
+							$blocks[] = $this->getBlockInfo($file);
+						}
+					}
+					return $blocks;
+				}
+			}
+			else return false;
+		}
+		
+		public function getBlockInfo($block){
+			$infoFile = $this->homePath.'temps/default/blocks/'.$block.'/info.json';
+			if(!file_exists($infoFile)) return false;
+			$info = json_decode(file_get_contents($infoFile), true);
+			$info['id'] = $block;
+			return $info;
+		}
+		
+		public function addBlock($block, $list, $pos){
+			if(!$this->getBlockInfo($block)) return false;
+			$this->settings['core']['blocks'][$list][] = ['block' => $block, 'pos' => $pos];
+			function sortFunc($a, $b){return ($a['pos'] > $b['pos']);}
+			uasort($this->settings['core']['blocks'][$list], 'sortFunc');
+			$this->setModuleSettings('core', ['blocks' => [$list => $this->settings['core']['blocks'][$list]]]);
+			return true;
+		}
+		
+		public function isBlockExists($block){
+			return (bool) file_exists($this->homePath.'temps/default/blocks/'.$block.'/info.json');
+		}
+		
 		//--------------------| Аккаунт |--------------------//
 		
-		public function userReg($data, $more = false){
+		public function userReg($data, $more = false){ // Регистрация нового пользователя
 			
 			if($this->settings['core']['captchaPubKey'] && $this->settings['core']['captchaSecKey']){
 				$reCap = $this->post('https://www.google.com/recaptcha/api/siteverify', [
@@ -126,7 +175,6 @@
 			$data['login'] = trim($data['login']);
 			$data['name'] = trim($data['name']);
 			$data['pass'] = trim($data['pass']);
-			$data['passa'] = trim($data['passa']);
 			
 			$check = $this->regDataCheck($data, true);
 			if(!$check['status']) return $more ? $check : false;
@@ -152,7 +200,7 @@
 			else return $more ? ['status' => false, 'msg' => 'Ошибка! Возникла непредвиденная ошибка'] : false;
 		}
 		
-		public function regDataCheck($data, $more = false){
+		public function regDataCheck($data, $more = false){ // Проверка полученных данных для регистрации
 			if(!empty($this->userid)) return $more ? ['status' => false, 'msg' => 'Ошибка! Вы уже авторизованы'] : false;
 			
 			if(!is_array($data)) return $more ? ['status' => false, 'msg' => 'Ошибка! При отправке данных возникла ошибка :('] : false;
@@ -175,7 +223,7 @@
 			return $more ? ['status' => true, 'msg' => 'Успех! Все данные введены верно'] : true;
 		}
 		
-		public function userAuth($data, $more = false){
+		public function userAuth($data, $more = false){ // Авторизация пользователя
 			if($this->userid) return $more ? ['status' => false, 'msg' => 'Ошибка! Вы уже авторизованы'] : false;
 			
 			if($data['login'] == '') return $more ? ['status' => false, 'msg' => 'Ошибка! Введите логин'] : false;
@@ -195,14 +243,14 @@
 			return $more ? ['status' => true, 'msg' => 'Успех! Авторизация прошла успешно'] : true;
 		}
 		
-		private function updateUserHash($id){
+		private function updateUserHash($id){ // Пересоздание хеша сессии пользователя
 			$data = $this->getUserInfo($id);
 			$userHash = md5($data['login'].'saltysalt'.$data['pass'].time());
 			$this->sql->update('users', ['userHash' => $userHash], ['id' => $id]);
 			return $userHash;
 		}
 		
-		public function userLogout($path){
+		public function userLogout($path){ // Логаут пользователя
 			if(is_array($_SESSION)) foreach($_SESSION as $key => $value) unset($_SESSION[$key]);
 			SetCookie('userHash', '', 32600, '/', null, null, true);
 			unset($this->userid);
@@ -211,7 +259,7 @@
 			die;
 		}
 		
-		public function checkAuth(){
+		public function checkAuth(){ // Проверка сессии пользователя
 			if(isset($_COOKIE['userHash']) && !empty($_COOKIE['userHash'])){
 				if(is_array($res = $this->sql->select('users', ['id'], ['userHash' => $_COOKIE['userHash']]))){
 					$_SESSION['userid'] = $res[0]['id'];
@@ -224,18 +272,18 @@
 			}
 		}
 		
-		public function getUserInfo($userid){
+		public function getUserInfo($userid){ // Получение информации об аккаунте
 			$res = $this->sql->select('users', '*', ['id' => $userid], 'id', true, 1)[0];
 			if($res != '') $res['custom'] = json_decode($res['custom'], true);
 			$res['pass'] = null;
 			return $res;
 		}
 		
-		public function getLastUser(){
+		public function getLastUser(){ // Получение идентификатора последнего зарегистрированного пользователя [НАДО ПЕРЕНЕСТИ В ОТДЕЛЬНЫЙ МОДУЛЬ]
 			return $this->getUserInfo($this->sql->select('users', ['id'], '', 'id', false, 1)[0]['id']);
 		}
 		
-		public function editUserInfo($id, $data, $more = false){
+		public function editUserInfo($id, $data, $more = false){ // Изменение информации об аккаунте
 			
 			$userInfo = $this->getUserInfo($id);
 			
@@ -260,7 +308,18 @@
 			return $more ? ['status' => true, 'msg' => 'Успех! Данные о пользователе изменены'] : true;
 		}
 		
-		public function getUserGroups($more = false){
+		public function editUserCustomData($id, $module, $data, $more = false){
+			if(!$data) 
+			if(!$data) 
+			
+			$res = json_decode($this->sql->select('users', ['custom'], ['id' => $id])[0]['custom'], true);
+			$newData[$module] = array_replace_recursive($res[$module], $data);
+			
+			$this->sql->update('users', ['custom' => $newData], ['id' => $id]);
+			
+		}
+		
+		public function getUserGroups($more = false){ // Получение массива групп пользователей
 			$ret[0] = ['name' => 'Все', 'id' => 0];
 			$res = $this->sql->select('groups', '*');
 			for($i = 0; $i < count($res); $i++) $ret[$i+1] = $res[$i];
@@ -269,7 +328,7 @@
 		
 		//--------------------| Сервера |--------------------//
 		
-		public $gamesNames = [
+		public $gamesNames = [ // id_игры => 'название_игры'
 			1 => 'Counter Strike 1.6',
 			2 => 'Counter Strike: Source',
 			3 => 'Counter Strike: Global Offensive',
@@ -277,7 +336,7 @@
 			5 => 'SA:MP',
 		];
 		
-		public function getServers($onlyActive = true, $game = '', $limit = ''){
+		public function getServers($onlyActive = true, $game = '', $limit = ''){ // Получение всех серверов
 			$where = '';
 			if($onlyActive) $where['active'] = 1;
 			if($game != '') $where['game'] = $game;
@@ -299,7 +358,7 @@
 			return $data;
 		}
 		
-		public function getServer($id){
+		public function getServer($id){ // Получение одного сервера
 			if(!($res = $this->sql->select('servers', '*', ['id' => $id], '`id`', true, 1)[0])) return false;
 			$data = [
 				'name' => $res['name'],
@@ -313,7 +372,7 @@
 			];
 		}
 		
-		public function addServer($data, $more = false){
+		public function addServer($data, $more = false){ // Добавление нового сервера
 			if(!isset($this->gamesNames[$data['game']])) return $more ? ['status' => false, 'msg' => 'Ошибка! Неизвестная игра'] : false;
 			if(!filter_var($data['ip'], FILTER_VALIDATE_IP)) return $more ? ['status' => false, 'msg' => 'Ошибка! Неверный формат IP адреса'] : false;
 			if($data['port'] > 49151) return $more ? ['status' => false, 'msg' => 'Ошибка! Порт указан неверно'] : false;
@@ -329,13 +388,13 @@
 			return $more ? ['status' => true, 'msg' => 'Успех! Сервер добавлен', 'data' => array_merge($sendData, ['id' => $id, 'gameName' => $this->gamesNames[$sendData['game']], 'fullAddress' => $sendData['ip'].':'.$sendData['port']])] : false;
 		}
 		
-		public function delServer($id, $more = false){
+		public function delServer($id, $more = false){ // Удаление сервера
 			if($id < 1) return $more ? ['status' => false, 'msg' => 'Ошибка! Такого сервера не существует'] : false;
 			if($this->sql->delete('servers', ['id' => $id])) return $more ? ['status' => true, 'msg' => 'Успех! Сервер удалён', 'data' => ['id' => $id]] : true;
 			return $more ? ['status' => false, 'msg' => 'Ошибка! Что-то пошло не так :('] : false;
 		}
 		
-		public function editServer($id, $data, $more = false){
+		public function editServer($id, $data, $more = false){ // Изменение информации о сервере
 			if(!isset($this->gamesNames[$data['game']])) return $more ? ['status' => false, 'msg' => 'Ошибка! Неизвестная игра'] : false;
 			if(!filter_var($data['ip'], FILTER_VALIDATE_IP)) return $more ? ['status' => false, 'msg' => 'Ошибка! Неверный формат IP адреса'] : false;
 			if($data['port'] > 49151) return $more ? ['status' => false, 'msg' => 'Ошибка! Порт указан неверно'] : false;
@@ -351,7 +410,7 @@
 			return $more ? ['status' => true, 'msg' => 'Успех! Сервер изменён', 'data' => array_merge($sendData, ['id' => $id, 'gameName' => $this->gamesNames[$sendData['game']], 'fullAddress' => $sendData['ip'].':'.$sendData['port']])] : false;
 		}
 		
-		public function setServerData($id, $data){
+		public function setServerData($id, $data){ // Изменение дополнительной информации о сервере
 			if($old = json_decode($this->sql->select('servers', ['data'], ['id' => $id], '`id`', true, 1)[0]['data'], true)){
 				$data = array_replace_recursive($old, $data);
 			}
@@ -361,7 +420,7 @@
 		
 		//--------------------| Меню |--------------------//
 		
-		public function getMenuItems($onlyActive = true){
+		public function getMenuItems($onlyActive = true){ // Получение ВСЕХ пунктов меню с их подпунктами
 			$where = ['parent' => 0];
 			if($onlyActive) $where = array_merge($where, ['active' => 1]);
 			$res = $this->sql->select('menu', '*', $where, 'pos', true);
@@ -375,7 +434,7 @@
 			return $res;
 		}
 		
-		public function addMenuItem($data = null, $more = false){
+		public function addMenuItem($data = null, $more = false){ // Добавление нового пункта меню
 			if($data == null){
 				$sendData = [
 					'name' => 'Новый пункт',
@@ -389,7 +448,7 @@
 			return $more ? ['status' => true, 'msg' => 'Успех! Пункт меню добавлен', 'data' => $sendData] : true;
 		}
 		
-		public function editMenuItem($id, $data, $more = false){
+		public function editMenuItem($id, $data, $more = false){ // Изменение информации о пункте меню
 			
 			if($data['parent'] > 0) if($this->getMenuItem($data['parent'])['submenu'] == false) return $more ? ['status' => false, 'msg' => 'Ошибка! ID родителя указан неверно'] : false;
 			
@@ -408,7 +467,7 @@
 			return $more ? ['status' => true, 'msg' => 'Успех! Пункт меню изменён', 'data' => $sendData] : true;
 		}
 		
-		public function getMenuItem($id){
+		public function getMenuItem($id){ // Получеие пункта меню с его подпунктами
 			$res = $this->sql->select('menu', '*', ['id' => $id])[0];
 			if($res['submenu'] && !$res['parent']) $res['submenu'] = $this->sql->select('menu', '*', ['parent' => $res['parent']], 'pos', true);
 			return $res;
@@ -418,20 +477,20 @@
 			
 		}
 		
-		public function deleteMenuItem($id, $more = false){
+		public function deleteMenuItem($id, $more = false){ // Удаление пункта меню
 			if(!$this->isMenuItemExists($id)) return $more ? ['status' => false, 'msg' => 'Ошибка! Такого пункта не существует'] : false;
 			$this->sql->delete('menu', '`id`='.$id.' OR `parent`='.$id);
 			if(!$this->isMenuItemExists($id)) return $more ? ['status' => true, 'msg' => 'Успех! Пункт меню удалён', 'data' => $id] : true;
 			else return $more ? ['status' => false, 'msg' => 'Ошибка! Что-то пошло не так :('] : false;
 		}
 		
-		public function isMenuItemExists($id){
+		public function isMenuItemExists($id){ // Проверка пункта меню на наличие
 			return (bool) $this->sql->select('menu', ['COUNT(*)'], ['id' => $id])[0]['COUNT(*)'];
 		}
 		
 		//--------------------| Настройки |--------------------//
 		
-		protected function getSettings(){
+		protected function getSettings(){ // Получение ВСЕХ настроек
 			if(!($res = $this->sql->select('settings', '*'))) return false;
 			for($i = 0; $i < count($res); $i++){
 				$setts = json_decode($res[$i]['data'], true);
@@ -440,12 +499,12 @@
 			return $data;
 		}
 		
-		public function getSettingsByModule($module){
+		public function getSettingsByModule($module){ // Получение настроек указанного модуля
 			$res = json_decode($this->sql->select('settings', '*', ['module' => $module])[0]['data'], true);
 			return $res != null ? $res : false;
 		}
 		
-		public function setModuleSettings($module, $settings){
+		public function setModuleSettings($module, $settings){ // Изменение настроек для указанного модуля
 			if($res = $this->sql->select('settings', ['data'], ['module' => $module])){
 				$old = json_decode($res[0]['data'], true);
 				$new = array_replace_recursive($old, $settings);
@@ -460,9 +519,9 @@
 			return true;
 		}
 		
-		//--------------------| Система модулей |--------------------//
+		//--------------------| Манагер модулей |--------------------//
 		
-		public function getModulesAdmins(){
+		public function getModulesAdmins(){ // Получение списка ВСЕХ модулей (Нужно для страницы менеджера модулей)
 			$path = $this->homePath.'lib/modules';
 			if(file_exists($path) && is_dir($path)){
 				$result = scandir($path);
@@ -479,11 +538,12 @@
 			return false;
 		}
 		
-		private function loadModules(){
+		private function loadModules(){ // Подгрузка всех активных модулей
 			$modules = $this->settings['core']['activeModules'];
 			foreach($modules as $k => $v){
 				if($v == true){
-					if(file_exists($this->homePath.'lib/modules/'.$k.'/class.php') && is_file($this->homePath.'lib/modules/'.$k.'/class.php')){
+					$classFile = $this->homePath.'lib/modules/'.$k.'/class.php';
+					if(file_exists($classFile) && is_file($classFile)){
 						require($this->homePath.'lib/modules/'.$k.'/class.php');
 						$this->modules[$k] = new $k($this);
 					}
@@ -492,7 +552,7 @@
 			}
 		}
 		
-		public function getModuleInfo($module){
+		public function getModuleInfo($module){ // Получение информации о модуле
 			$file = $this->homePath.'lib/modules/'.$module.'/info.json';
 			if(file_exists($file) && is_file($file)){
 				$info = json_decode(file_get_contents($file), true);
@@ -508,18 +568,18 @@
 			else return false;
 		}
 		
-		public function getModuleSettTpl($module){
+		public function getModuleSettTpl($module){ // Получение сруктуры страницы настроек модуля
 			$tplFile = $this->homePath.'lib/modules/'.$module.'/settings.json';
 			if(!file_exists($tplFile)) return false;
 			$info = json_decode(file_get_contents($tplFile), true);
 			return $info;
 		}
 		
-		public function isModuleInstalled($module){
+		public function isModuleInstalled($module){ // Проверка модуля на установленность
 			return isset($this->settings['core']['activeModules'][$module]);
 		}
 		
-		public function installModule($module, $more = false){
+		public function installModule($module, $more = false){ // Установка модуля
 			if($info = $this->getModuleInfo($module)){
 				if($info['installed']) return $more ? ['status' => false, 'msg' => 'Ошибка! Модуль уже установлен'] : false;
 				
@@ -546,7 +606,7 @@
 			else return $more ? ['status' => false, 'msg' => 'Ошибка! Модуль не найден'] : false;
 		}
 		
-		protected function checkModuleFiles($module, &$fileError){
+		protected function checkModuleFiles($module, &$fileError){ // Проверка целостности файлов модуля
 			$info = $this->getModuleInfo($module)['files'];
 			if(isset($info)){
 				for($i = 0; $i < count($info); $i++){
@@ -559,54 +619,50 @@
 			return true;
 		}
 		
-		public function isModuleActive($module){
+		public function isModuleActive($module){ // Проверка модуля на активность
 			return $this->isModuleInstalled($module) && $this->settings['core']['activeModules'][$module] === true;
 		}
 		
-		public function activateModule($module, $more = false){
+		public function activateModule($module, $more = false){ // Включение модуля
 			if($this->isModuleActive($module)) return $more ? ['status' => false, 'msg' => 'Ошибка! Модуль уже активен'] : false;
 			if(!$this->checkModuleFiles($module, $fileError)) return $more ? ['status' => false, 'msg' => 'Ошибка! Не найден файл модуля ('.$fileError.')'] : false;
 			$this->setModuleSettings('core', ['activeModules' => [$module => true]]);
 			return $more ? ['status' => true, 'msg' => 'Успех! Модуль активирован', 'data' => $this->getModuleInfo($module)] : true;
 		}
 		
-		public function deactivateModule($module, $more = false){
+		public function deactivateModule($module, $more = false){ // Отключение модуля
 			if(!$this->isModuleActive($module)) return $more ? ['status' => false, 'msg' => 'Ошибка! Модуль уже неактивен'] : false;
 			$this->setModuleSettings('core', ['activeModules' => [$module => false]]);
 			return $more ? ['status' => true, 'msg' => 'Успех! Модуль деактивирован', 'data' => $this->getModuleInfo($module)] : true;
 		}
 		
-		//--------------------| Для упрощения моддинга |--------------------//
+		//--------------------| Для моддинга |--------------------//
 		
-		private function engInclude($folder){
-			$path = $this->homePath.'lib/engIncludes/'.$folder;
-			if(file_exists($path) && is_dir($path)){
-				$result = scandir($path);
-				$files = array_diff($result, array('.', '..'));
-				if(count($files) > 0){
-					foreach($files as $file){
-						if(is_file("$path/$file")){
-							include($path.'/'.$file);
-						}
-					}
-				}
-			}
+		private $fwds = [];
+		
+		public function onEvent($event, $module, $funcName){ // Регистрация обработчика форварда ('Название форварда', 'Идентификитор модуля', 'Название функции')
+			$this->fwds[$event][] = [
+				'module' => $module,
+				'func' => $funcName,
+			];
 		}
 		
-		protected function engForward($name, $data){
-			$fwdData = $data;
-			$this->engInclude($name);
+		public function callForward($event, &$data){ // Вызов форварда ('Название форврда', [Данные передаваемые в обработчик])
+			for($i = 0; $i < count($this->fwds[$event]); $i++){
+				call_user_func([$this->modules[$this->fwds[$event][$i]['module']], $this->fwds[$event][$i]['func']], $data);
+			}
 		}
 		
 		//--------------------| Всякое |--------------------//
 		
-		protected $fileTypes = [
+		protected $fileTypes = [ // Список типов файлов с возможными расширениями
 			'image' => ['png', 'jpg', 'gif'],
 		];
 		
+		// Список запрещённых расширений (Без точки)
 		protected $fileBlackList = ['php', 'html', 'phtml', 'php3', 'php4', 'htm'];
 		
-		public function uploadFile($file, $fileName = '', $path = 'other', $type = '', $fileExp = '', $more = false){
+		public function uploadFile($file, $fileName = '', $path = 'other', $type = '', $fileExp = '', $more = false){ // Загрузка файла
 			for($i = 0; $i < count($this->fileBlackList); $i++) if(preg_match("/\.".$this->fileBlackList[$i]."$/i", $file['name'])) return $more ? ['status' => false, 'msg' => 'Ошибка! Недопустимый тип файла'] : false;
 			if(!$this->checkFileExp($file['name'], $type)) return $more ? ['status' => false, 'msg' => 'Ошибка! Неверный тип файла'] : false;
 			if(!preg_match("/\.".$fileExp."$/i", $file['name'])) return $more ? ['status' => false, 'msg' => 'Ошибка! Неверное расширение файла'] : false;
@@ -617,24 +673,24 @@
 			else return $more ? ['status' => false, 'msg' => 'Ошибка! Ошибка записи файла'] : false;
 		}
 		
-		private function checkFileExp($fileName, $type){
+		private function checkFileExp($fileName, $type){ // Првоерка пасширение файла для указанного типа файла
 			if(!$type) return true;
 			for($i = 0; $i < count($this->fileTypes[$type]); $i++) if(preg_match("/\.".$this->fileTypes[$type][$i]."$/i", $fileName)) return true;
 			return false;
 		}
 		
-		public function png2jpg($originalFile, $outputFile, $quality){
+		public function png2jpg($originalFile, $outputFile, $quality){ // ???
 			$image = imagecreatefrompng($originalFile);
 			imagejpeg($image, $outputFile, $quality);
 			imagedestroy($image);
 		}
 		
-		public static function redirect($link, $msg = ''){
+		public static function redirect($link, $msg = ''){ // Редирект на указанный URL
 			$_SESSION['msg'] = $msg;
 			header('Location: '.$link);
 		}
 		
-		public function post($url, $postVars = []){
+		public function post($url, $postVars = []){ // Отправка POST запроса
 			$postStr = http_build_query($postVars);
 			$options = [
 				'http' => [
@@ -652,7 +708,7 @@
 			return $result;
 		}
 		
-		public function pageButtons($page, $total){
+		public function pageButtons($page, $total){ // Вывод кнопок навигации по страницам
 			
 			$str = '<div align=center><ul class="pagination modal-5">';
 			$str .= '<li><a class="prev fa fa-angle-double-left" href="?p=1"></a></li>';
@@ -671,7 +727,7 @@
 			return $str;
 		}
 		
-		public function timeIntervalFormat($time){
+		public function timeIntervalFormat($time){ // Форматирование временнОго промежутка в формате hh:mm:ss
 			$hours = floor($time / 3600);
 			$time = $time % 3600;
 			$mins = floor($time / 60);
@@ -681,7 +737,7 @@
 		
 		public $months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 		
-		public function timeFormat($time, $firstLetter = false){
+		public function timeFormat($time, $firstLetter = false){ // Форматировани времени в формате как в ВК
 			$dayToday = (int) date('z');
 			$dayYesterday = (int) date('z', time() - 86400);
 			$daySend = (int) date('z', $time);
@@ -715,7 +771,7 @@
 			die;
 		}
 		
-		public function getIp(){
+		public function getIp(){ // Получение IP
 			$client  = @$_SERVER['HTTP_CLIENT_IP'];
 			$forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
 			$remote  = @$_SERVER['REMOTE_ADDR'];

@@ -16,37 +16,50 @@
 <table id="tplSettsCont">
 	<?php for($i = 0; $i < count($tpl); $i++):?>
 		<tr><td colspan="2" style="text-align: center;"><?php echo $tpl[$i]['name'];?></td></tr>
-		<?php for($k = 0; $k < count($tpl[$i]['items']); $k++):?>
-			<script>window.tplSets.push({id: '<?php echo $tpl[$i]['items'][$k]['id'];?>', type: '<?php echo $tpl[$i]['items'][$k]['type'];?>'});</script>
+		<?php if(isset($tpl[$i]['custom']) && $tpl[$i]['custom']):?>
 			<tr>
-				<td><?php echo $tpl[$i]['items'][$k]['name'];?></td>
-				<td>
-					<?php if($tpl[$i]['items'][$k]['type'] != 'custom'):?>
-						<input 
-							type="<?php echo $tpl[$i]['items'][$k]['type'];?>" 
-							class="w100 <?php echo $tpl[$i]['items'][$k]['type'] == 'checkbox' ? 'lc-switch' : 'styler';?>" 
-							<?php if(isset($this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']])):?>
-								<?php if($tpl[$i]['items'][$k]['type'] == 'checkbox'):?>
-									<?php echo $this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']] ? 'checked' : '';?> 
-								<?php else:?>
-									value="<?php echo $this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']];?>" 
-								<?php endif;?>
-							<?php endif;?>
-							<?php if($tpl[$i]['items'][$k]['type'] != 'checkbox'):?>
-								placeholder="<?php echo $tpl[$i]['items'][$k]['placeholder'];?>" 
-							<?php endif;?>
-							id="adminTpl<?php echo $tpl[$i]['items'][$k]['id'];?>" 
-						/>
-					<?php else:?>
-						<?php
-							if(!isset($tpl[$i]['items'][$k]['customFile'])) echo 'Путь до файла кастомной настройки не указан';
-							else if(file_exists($tpl[$i]['items'][$k]['customFile'])) require $this->homePath.$tpl[$i]['items'][$k]['customFile'];
-							else echo 'Файл кастомной настройки не найден';
-						?>
-					<?php endif;?>
+				<td colspan="2" style="text-align: center;">
+					<?php
+						if(!isset($tpl[$i]['customFile'])) echo 'Путь до файла кастомной настройки не указан';
+						else if(file_exists($tpl[$i]['customFile'])) require $this->homePath.$tpl[$i]['customFile'];
+						else echo 'Файл кастомной настройки не найден';
+					?>
 				</td>
 			</tr>
-		<?php endfor;?>
+			
+		<?php else:?>
+			<?php for($k = 0; $k < count($tpl[$i]['items']); $k++):?>
+				<script>window.tplSets.push({id: '<?php echo $tpl[$i]['items'][$k]['id'];?>', type: '<?php echo $tpl[$i]['items'][$k]['type'];?>'});</script>
+				<tr>
+					<td><?php echo $tpl[$i]['items'][$k]['name'];?></td>
+					<td>
+						<?php if($tpl[$i]['items'][$k]['type'] != 'custom'):?>
+							<input 
+								type="<?php echo $tpl[$i]['items'][$k]['type'];?>" 
+								class="w100 <?php echo $tpl[$i]['items'][$k]['type'] == 'checkbox' ? 'lc-switch' : 'styler';?>" 
+								<?php if(isset($this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']])):?>
+									<?php if($tpl[$i]['items'][$k]['type'] == 'checkbox'):?>
+										<?php echo $this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']] ? 'checked' : '';?> 
+									<?php else:?>
+										value="<?php echo $this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']];?>" 
+									<?php endif;?>
+								<?php endif;?>
+								<?php if($tpl[$i]['items'][$k]['type'] != 'checkbox'):?>
+									placeholder="<?php echo $tpl[$i]['items'][$k]['placeholder'];?>" 
+								<?php endif;?>
+								id="adminTpl<?php echo $tpl[$i]['items'][$k]['id'];?>" 
+							/>
+						<?php else:?>
+							<?php
+								if(!isset($tpl[$i]['items'][$k]['customFile'])) echo 'Путь до файла кастомной настройки не указан';
+								else if(file_exists($tpl[$i]['items'][$k]['customFile'])) require $this->homePath.$tpl[$i]['items'][$k]['customFile'];
+								else echo 'Файл кастомной настройки не найден';
+							?>
+						<?php endif;?>
+					</td>
+				</tr>
+			<?php endfor;?>
+		<?php endif;?>
 	<?php endfor;?>
 	<tr><td colspan="2"><div align=center><button onclick="saveTplSettings()" class="styler">Сохранить</button></div></td></tr>
 </table>

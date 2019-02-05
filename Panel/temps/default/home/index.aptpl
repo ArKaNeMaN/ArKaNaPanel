@@ -1,4 +1,3 @@
 <?$this->title = 'Домашняя страница'?>
-<?$this->incBlock('devPause');?>
 <?$this->incBlock('monitoring');?>
 <?$this->incBlock('helloWorld');?>

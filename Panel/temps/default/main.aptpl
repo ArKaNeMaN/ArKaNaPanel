@@ -152,9 +152,5 @@
 			$('.styler').styler();
 		});
 		
-		$('body').ready(() => {
-			$('body').css('background-image', 'url(<?php echo PANEL_HOME;?>public/temps/default/img/background.jpg)');
-		});
-		
 	</script>
 </html>

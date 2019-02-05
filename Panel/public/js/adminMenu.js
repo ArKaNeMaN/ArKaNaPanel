@@ -161,7 +161,6 @@ function adminMenuEdit(id){
 												else iziToast.error({title: res.msg});
 											}
 											else{
-												$('#menuModal').iziModal('stopLoading');
 												console.log(res);
 												iziToast.error({title: 'Возникла непредвиденная ошибка'});
 											}
@@ -197,7 +196,6 @@ function adminMenuEdit(id){
 												else iziToast.error({title: res.msg});
 											}
 											else{
-												$('#menuModal').iziModal('stopLoading');
 												console.log(res);
 												iziToast.error({title: 'Возникла непредвиденная ошибка'});
 											}
@@ -258,7 +256,7 @@ function clickAddMenuItem(){
 					if(res.status){
 						reloadMenuItemsList();
 						iziToast.success({title: res.msg});
-						adminMenuEdit(res.data.id);
+						setTimeout(function(){adminMenuEdit(res.data.id);}, 500);
 					}
 					else iziToast.error({title: res.msg});
 				}

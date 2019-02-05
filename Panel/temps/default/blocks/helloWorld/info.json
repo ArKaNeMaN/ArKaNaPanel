@@ -1,0 +1,6 @@
+{
+	"name": "Hello World",
+	"module": "core",
+	"allowRightCol": true,
+	"allowHomePage": true
+}

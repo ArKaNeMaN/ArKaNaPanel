@@ -21,6 +21,13 @@ thead{
 table{
 	width: 100%;
 	border-collapse: collapse;
+	max-width: 100%;
+}
+
+table.tFixed td{
+	//white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 th, td{
@@ -42,8 +49,21 @@ ul{
 	padding-left: 0;
 }
 
+ul.hover{
+	border-top: 1px solid rgba(20, 20, 20, .5);
+	user-select: none;
+}
+
+ul.hover li{
+	padding: 10px 25px;
+	border-bottom: 1px solid rgba(20, 20, 20, .5);
+}
+
+ul.hover li:hover{
+	background-color: rgba(255, 255, 255, .1);
+}
+
 .mainCont{
-    /* overflow: hidden; */
     width: 1300px;
     margin: 0 auto;
 }
