@@ -19,21 +19,26 @@ function reloadBlocksList(list){
 				isRequestProc = false;
 				$('#blocksList-'+list).waitMe('hide');
 				if(res instanceof Array){
-					srt = '';
+					str = '';
 					for(var i = 0; i < res.length; i++){
 						str += '\
-							<li>\
-								'+res[i].name+' (Модуль: '+res[i].module+')\
-								<button title="Удалить блок из списка" onclick="removeBlockFromList(\''+res[i].id+'\', \''+list+'\'); return false;" class="styler"><i class="fa fa-times"></i></button>\
-							</li>\
+							<tr>\
+								<td>'+res[i].id+'</td>\
+								<td>'+res[i].pos+'</td>\
+								<td>'+res[i].info.name+'</td>\
+								<td>'+res[i].info.module+'</td>\
+								<td>'+res[i].block+'</td>\
+								<td>\
+									<button style="border-top-right-radius: 0; border-bottom-right-radius: 0;" onclick="changeBlockPos('+res[i].id+', \''+list+'\', 1); return false;" class="styler"><i class="fa fa-sort-up"></i></button>\
+									<button style="border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="changeBlockPos('+res[i].id+', \''+list+'\', -1); return false;" class="styler"><i class="fa fa-sort-down"></i></button>\
+									<button title="Удалить блок из списка" onclick="removeBlockFromList('+res[i].id+', \''+list+'\'); return false;" class="styler"><i class="fa fa-times"></i></button>\
+								</td>\
+							</tr>\
 						';
 					}
 					$('#blocksList-'+list).html(str);
 				}
-				else{
-					console.log(res);
-					iziToast.error({title: 'Возникла непредвиденная ошибка'});
-				}
+				else $('#blocksList-'+list).html('</tr><td colspan="5"><div align=center>Пусто</div></td></tr>');
 			},
 			timeout: 5000,
 			error: function(jqXHR, status, errorThrown){
@@ -58,15 +63,16 @@ function removeBlockFromList(block, list){
 			dataType: 'json',
 			type: 'POST',
 			data: {
-				id: block,
+				block: block,
 				list: list
 			},
 			success: function(res){
 				isRequestProc = false;
 				$('#blocksList-'+list).waitMe('hide');
 				if(res instanceof Object){
+					console.log(res);
 					if(res.status){
-						reloadBlockList(list);
+						reloadBlocksList(list);
 						iziToast.success({title: res.msg});
 					}
 					else iziToast.error({title: res.msg});
@@ -99,7 +105,7 @@ function addBlockToList(block, list){
 			dataType: 'json',
 			type: 'POST',
 			data: {
-				id: block,
+				block: block,
 				list: list
 			},
 			success: function(res){
@@ -107,7 +113,50 @@ function addBlockToList(block, list){
 				$('#blocksList-'+list).waitMe('hide');
 				if(res instanceof Object){
 					if(res.status){
-						reloadBlockList(list);
+						reloadBlocksList(list);
+						iziToast.success({title: res.msg});
+					}
+					else iziToast.error({title: res.msg});
+				}
+				else{
+					console.log(res);
+					iziToast.error({title: 'Возникла непредвиденная ошибка'});
+				}
+			},
+			timeout: 5000,
+			error: function(jqXHR, status, errorThrown){
+				$('#blocksList-'+list).waitMe('hide');
+				isRequestProc = false;
+				alert('Ошибка! '+status+': '+errorThrown);
+			}
+		});
+	}
+}
+
+function changeBlockPos(id, list, pos){
+	if(!isRequestProc){
+		$('#blocksList-'+list).waitMe({
+			effect: 'stretch',
+			bg: 'rgba(30, 30, 30, .5)',
+			color: 'rgba(100, 100, 100, .8)'
+		});
+		isRequestProc = true;
+		$.ajax({
+			url: window.panelHome+'request/adminBlocks.php?action=changePos',
+			dataType: 'json',
+			type: 'POST',
+			data: {
+				id: id,
+				list: list,
+				pos: pos
+			},
+			success: function(res){
+				isRequestProc = false;
+				$('#blocksList-'+list).waitMe('hide');
+				if(res instanceof Object){
+					console.log(res);
+					if(res.status){
+						reloadBlocksList(list);
 						iziToast.success({title: res.msg});
 					}
 					else iziToast.error({title: res.msg});

@@ -134,8 +134,12 @@
 				</div>
 			</div>
 			<div class="rightCol">
-				<?php $this->incBlock('helloWorld');?>
-				<?php $this->incBlock('lastUser');?>
+				<?php
+					$rightColBlocks = json_decode($this->settings['core']['blocks']['rightCol'], true);
+					function rightColBlocks_sortFunc($a, $b){return ($a['pos'] > $b['pos']);}
+					uasort($rightColBlocks, 'rightColBlocks_sortFunc');
+					foreach($rightColBlocks as $v) if($this->getBlockInfo($v['block'])['allowRightCol']) $this->incBlock($v['block']);
+				?>
 			</div>
 			
 			<div class="footer">

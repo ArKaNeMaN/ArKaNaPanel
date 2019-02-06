@@ -1,60 +1,107 @@
-<?php $this->title = "Менеджер блоков";?>
+<?php $this->title = "Менеджер блоков"; $this->checkAccess(1);?>
 <h2 align=center>Менеджер блоков</h2>
 
 <script src="<?php echo PANEL_HOME;?>public/js/adminBlocks.js" defer></script>
 
-<h3><i class="fa fa-list"></i> Блоки в правой колонке</h3>
-<ul id="blocksList-rightCol" class="hover">
-	<?php if($blocks = $this->settings['core']['blocks']['rightCol']):?>
-		<?php for($i = 0; $i < count($blocks); $i++):?>
-			<li>
-				<?php echo $blocks[$i]['block'];?>
-				<span style="float: right;">
-					<button title="Удалить блок из списка" onclick="removeBlockFromList('<?php echo $blocks[$i]['id']?>', 'rightCol'); return false;" class="styler"><i class="fa fa-times"></i></button>
-				</span>
-			</li>
-		<?php endfor;?>
-	<?php else:?>
-		<li><span align=center>Пусто</span></li>
-	<?php endif;?>
-</ul>
+<h3>
+	<i class="fa fa-list"></i> Блоки в правой колонке
+	<button class="styler" onclick="reloadBlocksList('rightCol'); return false;"><i class="fa fa-sync-alt"></i></button>
+</h3>
 
-<h3><i class="fa fa-home"></i> Блоки на главной странице</h3>
-<ul id="blocksList-homePage" class="hover">
-	<?php if($blocks = $this->settings['core']['blocks']['homePage']):?>
-		<?php for($i = 0; $i < count($blocks); $i++):?>
-			<li>
-				<?php echo json_encode($blocks[$i]);?>
-				<span style="float: right;">
-					<button title="Удалить блок из списка" onclick="removeBlockFromList('<?php echo $blocks[$i]['id']?>', 'homePage'); return false;" class="styler"><i class="fa fa-times"></i></button>
-				</span>
-			</li>
-		<?php endfor;?>
-	<?php else:?>
-		<li><span align=center>Пусто</span></li>
-	<?php endif;?>
-</ul>
+<table>
+	<thead>
+		<th>№</th>
+		<th>Позиция</th>
+		<th>Название</th>
+		<th>Модуль</th>
+		<th>ID</th>
+		<th>Действия</th>
+	</thead>
+	<tbody id="blocksList-rightCol">
+		<?php if($blocks = $this->getBlocksList('rightCol')):?>
+			<?php for($i = 0; $i < count($blocks); $i++):?>
+			<tr>
+				<td><?php echo $blocks[$i]['id'];?></td>
+				<td><?php echo $blocks[$i]['pos'];?></td>
+				<td><?php echo $blocks[$i]['info']['name'];?></td>
+				<td><?php echo $blocks[$i]['info']['module'];?></td>
+				<td><?php echo $blocks[$i]['block'];?></td>
+				<td>
+					<button style="border-top-right-radius: 0; border-bottom-right-radius: 0;" onclick="changeBlockPos(<?php echo $blocks[$i]['id'];?>, 'rightCol', 1); return false;" class="styler"><i class="fa fa-sort-up"></i></button>
+					<button style="border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="changeBlockPos(<?php echo $blocks[$i]['id'];?>, 'rightCol', -1); return false;" class="styler"><i class="fa fa-sort-down"></i></button>
+					<button title="Удалить блок из списка" onclick="removeBlockFromList(<?php echo $blocks[$i]['id'];?>, 'rightCol'); return false;" class="styler"><i class="fa fa-times"></i></button>
+				</td>
+			</tr>
+			<?php endfor;?>
+		<?php else:?>
+			</tr><td colspan="5"><div align=center>Пусто</div></td></tr>
+		<?php endif;?>
+	</tbody>
+</table>
 
-<h3><i class="fa fa-th-large"></i> Все блоки</h3>
-<ul id="allBlocksList" class="hover">
-	<?php if($blocks = $this->getAdminBlocks()):?>
-		<?php for($i = 0; $i < count($blocks); $i++):?>
-			<li>
-				<?php echo $blocks[$i]['name'];?> <span class="blocksModule">(Модуль: <?php echo $blocks[$i]['module']?>)</span>
-				<span style="float: right;">
+<h3>
+	<i class="fa fa-home"></i> Блоки на главной странице
+	<button class="styler" onclick="reloadBlocksList('homePage'); return false;"><i class="fa fa-sync-alt"></i></button>
+</h3>
+
+<table>
+	<thead>
+		<th>№</th>
+		<th>Позиция</th>
+		<th>Название</th>
+		<th>Модуль</th>
+		<th>ID</th>
+		<th>Действия</th>
+	</thead>
+	<tbody id="blocksList-homePage">
+		<?php if($blocks = $this->getBlocksList('homePage')):?>
+			<?php for($i = 0; $i < count($blocks); $i++):?>
+			<tr>
+				<td><?php echo $blocks[$i]['id'];?></td>
+				<td><?php echo $blocks[$i]['pos'];?></td>
+				<td><?php echo $blocks[$i]['info']['name'];?></td>
+				<td><?php echo $blocks[$i]['info']['module'];?></td>
+				<td><?php echo $blocks[$i]['block'];?></td>
+				<td>
+					<button style="border-top-right-radius: 0; border-bottom-right-radius: 0;" onclick="changeBlockPos(<?php echo $blocks[$i]['id'];?>, 'homePage', 1); return false;" class="styler"><i class="fa fa-sort-up"></i></button>
+					<button style="border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="changeBlockPos(<?php echo $blocks[$i]['id'];?>, 'homePage', -1); return false;" class="styler"><i class="fa fa-sort-down"></i></button>
+					<button title="Удалить блок из списка" onclick="removeBlockFromList(<?php echo $blocks[$i]['id'];?>, 'homePage'); return false;" class="styler"><i class="fa fa-times"></i></button>
+				</td>
+			</tr>
+			<?php endfor;?>
+		<?php else:?>
+			</tr><td colspan="5"><div align=center>Пусто</div></td></tr>
+		<?php endif;?>
+	</tbody>
+</table>
+
+<h3>
+	<i class="fa fa-th-large"></i> Все блоки
+	<button class="styler" onclick="reloadAllBLocksList(); return false;"><i class="fa fa-sync-alt"></i></button>
+</h3>
+
+<table>
+	<thead>
+		<th>Название</th>
+		<th>Модуль</th>
+		<th>ID</th>
+		<th>Действия</th>
+	</thead>
+	<tbody id="allBlocksList">
+		<?php if($blocks = $this->getAdminBlocks()):?>
+			<?php for($i = 0; $i < count($blocks); $i++):?>
+			<tr>
+				<td><?php echo $blocks[$i]['name'];?></td>
+				<td><?php echo $blocks[$i]['module'];?></td>
+				<td><?php echo $blocks[$i]['id'];?></td>
+				<td>
 					<button title="Добавить блок на главную страницу" onclick="addBlockToList('<?php echo $blocks[$i]['id']?>', 'homePage'); return false;" class="styler"><i class="fa fa-home"></i></button>
 					<button title="Добавить блок в правую колонку" onclick="addBlockToList('<?php echo $blocks[$i]['id']?>', 'rightCol'); return false;" class="styler"><i class="fa fa-list"></i></button>
-				</span>
-			</li>
-		<?php endfor;?>
-	<?php else:?>
-		<li><span align=center>Пусто</span></li>
-	<?php endif;?>
-</ul>
-
-<style>
-	span.blocksModule{
-		font-size: 80%;
-		opacity: .5;
-	}
-</style>
+				</td>
+			</tr>
+			<?php endfor;?>
+		<?php else:?>
+			</tr><td colspan="4"><div align=center>Пусто</div></td></tr>
+		<?php endif;?>
+	</tbody>
+</table>

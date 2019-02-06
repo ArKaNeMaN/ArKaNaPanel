@@ -138,6 +138,18 @@
 			else return false;
 		}
 		
+		public function getBlocksList($list){
+			if(!isset($this->settings['core']['blocks'][$list])) return false;
+			$blocks = json_decode($this->settings['core']['blocks'][$list], true);
+			foreach($blocks as $k => $v){
+				$blocks_[] = array_merge($v, [
+					'id' => $k,
+					'info' => $this->getBlockInfo($v['block']),
+				]);
+			}
+			return $blocks_;
+		}
+		
 		public function getBlockInfo($block){
 			$infoFile = $this->homePath.'temps/default/blocks/'.$block.'/info.json';
 			if(!file_exists($infoFile)) return false;
@@ -147,11 +159,22 @@
 		}
 		
 		public function addBlock($block, $list, $pos){
-			if(!$this->getBlockInfo($block)) return false;
-			$this->settings['core']['blocks'][$list][] = ['block' => $block, 'pos' => $pos];
-			function sortFunc($a, $b){return ($a['pos'] > $b['pos']);}
-			uasort($this->settings['core']['blocks'][$list], 'sortFunc');
-			$this->setModuleSettings('core', ['blocks' => [$list => $this->settings['core']['blocks'][$list]]]);
+			if(!$this->isBlockExists($block)) return false;
+			$blocks = json_decode($this->settings['core']['blocks'][$list], true);
+			$blocks[] = ['block' => $block, 'pos' => $pos];
+			/* function sortFunc($a, $b){return ($a['pos'] > $b['pos']);}
+			uasort($this->settings['core']['blocks'][$list], 'sortFunc'); */
+			$this->setModuleSettings('core', ['blocks' => [$list => json_encode($blocks)]]);
+			return true;
+		}
+		
+		public function removeBlockByNum($blockId, $list){
+			$blocks = json_decode($this->settings['core']['blocks'][$list], true);
+			if(!isset($blocks[$blockId])) return false;
+			unset($blocks[$blockId]);
+			/* function sortFunc($a, $b){return ($a['pos'] > $b['pos']);}
+			uasort($blocks, 'sortFunc'); */
+			$this->setModuleSettings('core', ['blocks' => [$list => json_encode($blocks)]]);
 			return true;
 		}
 		

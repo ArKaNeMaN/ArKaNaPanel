@@ -67,7 +67,7 @@
 			require('createTables.php');
 			
 			// Добавление дефолтных настроек панели
-			$sql->query("INSERT INTO `".$_POST['prefix']."settings` (`id`, `module`, `data`) VALUES (1, 'core', '".json_encode(json_decode('{"siteName":"ArKaNaPanel","homePage":"home","yaMetrika":0,"googleAnalytics":"","zipAvatars":0,"blocks":{"rightCol":[],"homePage":[]}}'))."');");
+			$sql->query("INSERT INTO `".$_POST['prefix']."settings` (`id`, `module`, `data`) VALUES (1, 'core', '".json_encode(json_decode('{"siteName":"ArKaNaPanel","homePage":"home","yaMetrika":0,"googleAnalytics":"","zipAvatars":0,"blocks":{"homePage":"[{\"block\":\"helloWorld\",\"pos\":2},{\"block\":\"monitoring\",\"pos\":1}]","rightCol":"[{\"block\":\"helloWorld\",\"pos\":1},{\"block\":\"lastUser\",\"pos\":2}]"}}'))."');");
 			
 			// Создание аккаунта админа
 			$sql->query("INSERT INTO `".$_POST['prefix']."users` (`login`, `name`, `pass`, `group`, `regIp`, `lastIp`, `regTime`) VALUES('".$_POST['adminLogin']."', '".$_POST['adminName']."', '".md5($_POST['adminPass'])."', 1, '".getIp()."', '".getIp()."', ".time().")");
@@ -80,8 +80,9 @@
 					(3, 1, 'Настройка панели', 'admin', 1, 0, 1, 1, 2),
 					(4, 2, 'Менеджер модулей', 'admin/modules', 1, 0, 1, 1, 2),
 					(5, 3, 'Менеджер блоков', 'admin/blocks', 1, 0, 1, 1, 2),
-					(6, 3, 'Менеджер серверов', 'admin/servers', 1, 0, 1, 1, 2),
-					(7, 4, 'Меню', 'admin/menu', 1, 0, 1, 1, 2);
+					(6, 4, 'Менеджер серверов', 'admin/servers', 1, 0, 1, 1, 2),
+					(7, 5, 'Меню', 'admin/menu', 1, 0, 1, 1, 2);
+					(8, 6, 'Логи', 'admin/logs', 1, 0, 1, 1, 2);
 			");
 			
 			// Добавление дефолтных групп пользователей
