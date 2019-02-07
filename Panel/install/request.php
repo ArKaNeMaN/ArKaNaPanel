@@ -47,7 +47,7 @@
 			if(strlen($_POST['adminPass']) < 4) rJson(['status' => false, 'msg' => 'Ошибка! Пароль должен быть длиннее 3-х символов']);
 			
 			$sqlCfgFile = '../configs/sql.php';
-			$cfgStr = "<?
+			$cfgStr = "<?php
 	define('SQL_HOST', '".$_POST['host']."');
 	define('SQL_USER', '".$_POST['user']."');
 	define('SQL_PASS', '".$_POST['pass']."');
@@ -66,31 +66,83 @@
 			
 			require('createTables.php');
 			
-			// Добавление дефолтных настроек панели
-			$sql->query("INSERT INTO `".$_POST['prefix']."settings` (`id`, `module`, `data`) VALUES (1, 'core', '".json_encode(json_decode('{"siteName":"ArKaNaPanel","homePage":"home","yaMetrika":0,"googleAnalytics":"","zipAvatars":0,"blocks":{"homePage":"[{\"block\":\"helloWorld\",\"pos\":2},{\"block\":\"monitoring\",\"pos\":1}]","rightCol":"[{\"block\":\"helloWorld\",\"pos\":1},{\"block\":\"lastUser\",\"pos\":2}]"}}'))."');");
+			require '../lib/db_class.php';
+			
+			$sql_ = new DataBase($_POST['host'], $_POST['user'], $_POST['pass'], $_POST['name'], $_POST['prefix'], $_POST['encode']);
+			
+			$sql_->insert('users', [
+				'login' => $_POST['adminLogin'],
+				'name' => $_POST['adminName'],
+				'pass' => md5($_POST['adminPass']),
+				'group' => 1,
+				'regIp' => getIp(),
+				'lastIp' => getIp(),
+				'regTime' => time(),
+			]);
 			
 			// Создание аккаунта админа
-			$sql->query("INSERT INTO `".$_POST['prefix']."users` (`login`, `name`, `pass`, `group`, `regIp`, `lastIp`, `regTime`) VALUES('".$_POST['adminLogin']."', '".$_POST['adminName']."', '".md5($_POST['adminPass'])."', 1, '".getIp()."', '".getIp()."', ".time().")");
+			/* $sql->query("INSERT INTO `".$_POST['prefix']."users` (`login`, `name`, `pass`, `group`, `regIp`, `lastIp`, `regTime`) 
+			VALUES('".$_POST['adminLogin']."', '".$_POST['adminName']."', '".md5($_POST['adminPass'])."', 1, '".getIp()."', '".getIp()."', ".time().")"); */
 			
 			// Добавление дефолтных пунктов меню
 			$sql->query("
 				INSERT INTO `".$_POST['prefix']."menu` (`id`, `pos`, `name`, `link`, `active`, `submenu`, `type`, `group`, `parent`) VALUES
 					(1, 1, 'Главная', '', 1, 0, 0, 0, 0),
-					(2, 2, 'Админка', NULL, 1, 1, 1, 1, 0),
+					(2, 2, 'Админка', '', 1, 1, 1, 1, 0),
 					(3, 1, 'Настройка панели', 'admin', 1, 0, 1, 1, 2),
 					(4, 2, 'Менеджер модулей', 'admin/modules', 1, 0, 1, 1, 2),
 					(5, 3, 'Менеджер блоков', 'admin/blocks', 1, 0, 1, 1, 2),
 					(6, 4, 'Менеджер серверов', 'admin/servers', 1, 0, 1, 1, 2),
-					(7, 5, 'Меню', 'admin/menu', 1, 0, 1, 1, 2);
-					(8, 6, 'Логи', 'admin/logs', 1, 0, 1, 1, 2);
+					(7, 5, 'Меню', 'admin/menu', 1, 0, 1, 1, 2),
+					(8, 6, 'Логи', 'admin/logs', 1, 0, 1, 1, 2)
 			");
 			
 			// Добавление дефолтных групп пользователей
 			$sql->query("
 				INSERT INTO `ap_groups` (`id`, `name`) VALUES
 					(1, 'Гл.Админ'),
-					(100, 'Пользователь');
+					(100, 'Пользователь')
 			");
+			
+			$defSetts = [
+				'siteName' => 'ArKaNaPanel',
+				'homePage' => 'home',
+				'yaMetrika' => 0,
+				'googleAnalytics' => 0,
+				'zipAvatars' => 0,
+				'blocks' => [
+					'homePage' => json_encode([
+						[
+							'block' => 'monitoring',
+							'pos' => 1
+						],
+						[
+							'block' => 'helloWorld',
+							'pos' => 2
+						],
+					]),
+					'rightCol' => json_encode([
+						[
+							'block' => 'helloWorld',
+							'pos' => 1
+						],
+						[
+							'block' => 'lastUser',
+							'pos' => 2
+						],
+					]),
+				],
+			];
+			
+			$sql_->insert('settings', [
+				'id' => 1,
+				'module' => 'core',
+				'data' => json_encode($defSetts),
+			]);
+			
+			// Добавление дефолтных настроек панели
+			//$sql->query('INSERT INTO `'.$_POST['prefix'].'settings` (`id`, `module`, `data`) VALUES (1, "core", "{"siteName":"ArKaNaPanel","homePage":"home","yaMetrika":0,"googleAnalytics":"","zipAvatars":1,"activeModules":{"banlist":true,"timeStats":true,"amxAdmins":true},"captchaPubKey":"","captchaSecKey":"","blocks":{"homePage":"[{\\"block\\":\\"helloWorld\\",\\"pos\\":2},{\\"block\\":\\"monitoring\\",\\"pos\\":1}]","rightCol":"[{\\"block\\":\\"helloWorld\\",\\"pos\\":1},{\\"block\\":\\"lastUser\\",\\"pos\\":2}]"}}");');
+			
 			
 			rJson(['status' => true, 'msg' => 'Успех! Установка панели прошла успешно', 'data' => '<h2>Панель установлена</h2>Для безопасности, удалите папку install из корня панели']);
 			
