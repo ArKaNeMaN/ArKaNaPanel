@@ -9,6 +9,7 @@
 			$data = [
 				'siteName' => $_POST['siteName'],
 				'homePage' => $_POST['homePage'],
+				'panelTheme' => $_POST['panelTheme'],
 				'yaMetrika' => (int) $_POST['yaMetrika'],
 				'googleAnalytics' => $_POST['googleAnalytics'],
 				'zipAvatars' => (int) $_POST['zipAvatars'],

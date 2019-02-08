@@ -15,6 +15,7 @@ $(document).ready(function(){
 				data: {
 					siteName: $('#adminMainSiteName').val(),
 					homePage: $('#adminMainHomePage').val(),
+					panelTheme: $('#adminMainPanelTheme').val(),
 					yaMetrika: $('#adminMainYaMetrika').val(),
 					googleAnalytics: $('#adminMainGoogleAnalytics').val(),
 					zipAvatars: Number($('#adminMainZipAvatars').is(':checked')),

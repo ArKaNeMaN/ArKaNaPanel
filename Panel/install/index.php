@@ -3,11 +3,12 @@
 	ini_set('display_errors', 0);
 	error_reporting(E_ALL);
 	
-	require_once('../configs/main.php');
 	if(file_exists('../configs/sql.php')){
-	header('Location: '.PANEL_HOME);
-	exit;
-}?>
+		require('../configs/main.php');
+		header('Location: '.PANEL_HOME);
+		exit;
+	}
+?>
 <html>
 	<head>
 		<title>ArKaNaPanel | Установка</title>
@@ -53,6 +54,7 @@
 							dataType: 'json',
 							type: 'POST',
 							data: {
+								panelDir: $('#installPanelDir').val(),
 								host: $('#installDbHost').val(),
 								user: $('#installDbUser').val(),
 								pass: $('#installDbPass').val(),
@@ -147,6 +149,13 @@
 					<h2>Установка панели</h2>
 					<div style="margin-left: 15px;">
 						<table>
+							<tr>
+								<td colspan="2" style="text-align: center">Корневая папка панели</td>
+							</tr>
+							<tr>
+								<td>Корневая папка панели</td>
+								<td><input type="text" class="styler" placeholder="Корень панели" id="installPanelDir" /></td>
+							</tr>
 							<tr>
 								<td colspan="2" style="text-align: center">Подключение к базе данных</td>
 							</tr>

@@ -29,11 +29,11 @@
 		<!--JS-->
 		
 		<!--Стили-->
-		<link href="<?php echo PANEL_HOME?>public/temps/<?php echo PANEL_THEME?>/css/style.css" rel="stylesheet">
-		<script>loadCSS('<?php echo PANEL_HOME?>public/temps/<?php echo PANEL_THEME?>/css/blocks.css');</script>
-		<script>loadCSS('<?php echo PANEL_HOME?>public/temps/<?php echo PANEL_THEME?>/css/userBlock.css');</script>
-		<script>loadCSS('<?php echo PANEL_HOME?>public/temps/<?php echo PANEL_THEME?>/css/navMenu.css');</script>
-		<script>loadCSS('<?php echo PANEL_HOME?>public/temps/<?php echo PANEL_THEME?>/css/pagination.css');</script>
+		<link href="<?php echo PANEL_HOME.$this->getTplThemePath('public/temps', '/css/style.css');?>" rel="stylesheet">
+		<script>loadCSS('<?php echo PANEL_HOME.$this->getTplThemePath('public/temps', '/css/blocks.css');?>');</script>
+		<script>loadCSS('<?php echo PANEL_HOME.$this->getTplThemePath('public/temps', '/css/userBlock.css');?>');</script>
+		<script>loadCSS('<?php echo PANEL_HOME.$this->getTplThemePath('public/temps', '/css/navMenu.css');?>');</script>
+		<script>loadCSS('<?php echo PANEL_HOME.$this->getTplThemePath('public/temps', '/css/pagination.css');?>');</script>
 		<!--Стили-->
 		
 		<!--Шрифты-->

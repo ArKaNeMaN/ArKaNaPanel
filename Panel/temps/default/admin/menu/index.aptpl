@@ -11,7 +11,7 @@
 </script>
 
 <script src="<?php echo PANEL_HOME;?>public/js/adminMenu.js"></script>
-<link href="<?php echo PANEL_HOME;?>public/temps/<?=PANEL_THEME?>/css/adminMenu.css" rel="stylesheet"/>
+<link href="<?php echo PANEL_HOME.$this->getTplThemePath('public/temps', '/css/adminMenu.css');?>" rel="stylesheet"/>
 
 <div id="menuModal" class="modal-custom"></div>
 

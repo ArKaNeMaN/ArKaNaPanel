@@ -45,9 +45,10 @@
 			if($_POST['adminPass'] != $_POST['adminPassa']) rJson(['status' => false, 'msg' => 'Ошибка! Пароли не совпадают']);
 			if($_POST['adminPass'] == '') rJson(['status' => false, 'msg' => 'Ошибка! Введите пароль админа']);
 			if(strlen($_POST['adminPass']) < 4) rJson(['status' => false, 'msg' => 'Ошибка! Пароль должен быть длиннее 3-х символов']);
+			if(!isset($_POST['panelDir'])) $_POST['panelDir'] = '';
 			
 			$sqlCfgFile = '../configs/sql.php';
-			$cfgStr = "<?php
+			$sqlCfgStr = "<?php
 	define('SQL_HOST', '".$_POST['host']."');
 	define('SQL_USER', '".$_POST['user']."');
 	define('SQL_PASS', '".$_POST['pass']."');
@@ -55,8 +56,20 @@
 	define('SQL_PREFIX', '".$_POST['prefix']."');
 	define('SQL_ENCODE', '".$_POST['encode']."');"; // Пардон за кривость... Но если я тут сделаю норм, то в файле будет криво... Лучше уж так...
 			
-			if(!$fHandler = fopen($sqlCfgFile, 'w')) rJson(['status' => false, 'msg' => 'Ошибка! Файл настроек БД недоступен']);
-			if(fwrite($fHandler, $cfgStr) === FALSE) rJson(['status' => false, 'msg' => 'Ошибка! Файл настроек БД недоступен для записи']);
+			if(!$fHandler = fopen($sqlCfgFile, 'w')) rJson(['status' => false, 'msg' => 'Ошибка! Папка настроек недоступна для записи']);
+			if(fwrite($fHandler, $sqlCfgStr) === FALSE) rJson(['status' => false, 'msg' => 'Ошибка! Папка настроек недоступна для записи']);
+			fclose($fHandler);
+			
+			$mainCfgFile = '../configs/main.php';
+			$mainCfgStr = "<?php
+	define('PANEL_DIR_', '".$_POST['panelDir']."');
+	
+	
+	define('PANEL_DIR', PANEL_DIR_ ? PANEL_DIR_.'/' : '');
+	define('PANEL_HOME', 'http://'.\$_SERVER['SERVER_NAME'].'/'.PANEL_DIR);"; // Пардон за кривость... Но если я тут сделаю норм, то в файле будет криво... Лучше уж так...
+			
+			if(!$fHandler = fopen($mainCfgFile, 'w')) rJson(['status' => false, 'msg' => 'Ошибка! Папка настроек недоступна для записи']);
+			if(fwrite($fHandler, $mainCfgStr) === FALSE) rJson(['status' => false, 'msg' => 'Ошибка! Папка настроек недоступна для записи']);
 			fclose($fHandler);
 			
 			$sql = new mysqli($_POST['host'], $_POST['user'], $_POST['pass'], $_POST['name']);
@@ -107,6 +120,7 @@
 			$defSetts = [
 				'siteName' => 'ArKaNaPanel',
 				'homePage' => 'home',
+				'panelTheme' => 'default',
 				'yaMetrika' => 0,
 				'googleAnalytics' => 0,
 				'zipAvatars' => 0,

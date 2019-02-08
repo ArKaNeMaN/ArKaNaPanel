@@ -10,9 +10,9 @@
 	
 	mb_internal_encoding("utf-8");
 	
-	require_once('configs/main.php');
+	if(!file_exists('configs/sql.php')) header('Location: install');
 	
-	if(!file_exists('configs/sql.php')) header('Location: /'.PANEL_DIR.'install');
+	require_once('configs/main.php');
 	
 	require_once('lib/engine_class.php');
 	$engine = new engine();

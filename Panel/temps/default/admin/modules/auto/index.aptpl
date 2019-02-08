@@ -39,9 +39,9 @@
 								class="w100 <?php echo $tpl[$i]['items'][$k]['type'] == 'checkbox' ? 'lc-switch' : 'styler';?>" 
 								<?php if(isset($this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']])):?>
 									<?php if($tpl[$i]['items'][$k]['type'] == 'checkbox'):?>
-										<?php echo $this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']] ? 'checked' : '';?> 
+										<?php echo $this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']] ? 'checked' : ($tpl[$i]['items'][$k]['default'] ? 'checked' : '');?> 
 									<?php else:?>
-										value="<?php echo $this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']];?>" 
+										value="<?php echo $this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']] ? $this->settings[$_GET['module']][$tpl[$i]['items'][$k]['id']] : (isset($tpl[$i]['items'][$k]['default']) ? $tpl[$i]['items'][$k]['default'] : '');?>" 
 									<?php endif;?>
 								<?php endif;?>
 								<?php if($tpl[$i]['items'][$k]['type'] != 'checkbox'):?>

@@ -16,6 +16,10 @@
 		<td><input class="styler w100" type="text" placeholder="Начальная страница" id="adminMainHomePage" value="<?=$this->settings['core']['homePage']?>"></td>
 	</tr>
 	<tr>
+		<td style="width: auto;">Шаблон</td>
+		<td><input class="styler w100" type="text" placeholder="Шаблон" id="adminMainPanelTheme" value="<?=$this->settings['core']['panelTheme']?>"></td>
+	</tr>
+	<tr>
 		<td style="width: auto;">Сжимать аватарки?</td>
 		<td><input class="lc-switch" type="checkbox" id="adminMainZipAvatars" <?php echo $this->settings['core']['zipAvatars'] ? 'checked' : ''?>></td>
 	</tr>

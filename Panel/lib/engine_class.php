@@ -59,27 +59,29 @@
 			}
 			if($content == $defCont) header('Location: /'.PANEL_DIR);
 			if(!$content) $content = $defCont;
-			if(!file_exists('temps/'.PANEL_THEME.'/'.$content.'/index.aptpl')) $content = 'error/404';
+			if(!file_exists($this->getTplThemePath('temps', '/'.$content.'/index.aptpl')) && !file_exists($this->getTplThemePath('temps', '/'.$content.'.aptpl'))) $content = 'error/404';
 			$this->pageContent = $this->getTpl($content);
 			if($this->error != '') $this->pageContent = $this->getTpl('error/'.$this->error);
 			echo $this->getTpl('main');
 		}
 		
 		protected function getTpl($content){ // Получение содержимого страницы
-			$content = file_exists('temps/'.PANEL_THEME.'/'.$content.'.aptpl') ? 'temps/'.PANEL_THEME.'/'.$content.'.aptpl' : 'temps/'.PANEL_THEME.'/'.$content.'/index.aptpl';
+			//$content = file_exists('temps/'.PANEL_THEME.'/'.$content.'.aptpl') ? 'temps/'.PANEL_THEME.'/'.$content.'.aptpl' : 'temps/'.PANEL_THEME.'/'.$content.'/index.aptpl';
+			$content = file_exists($this->getTplThemePath('temps', '/'.$content.'.aptpl')) ? $this->getTplThemePath('temps', '/'.$content.'.aptpl') : $this->getTplThemePath('temps', '/'.$content.'/index.aptpl');
 			ob_start(); 				 
 			include($content);
 			return ob_get_clean();
 		}
 		
-		protected function getTplThemePath($path){
-			$path_ = 'temps/'.PANEL_THEME.'/'.$path;
+		protected function getTplThemePath($folder, $path){
+			$path_ = $folder.'/'.$this->settings['core']['panelTheme'].$path;
 			if(file_exists($path_)) return $path_;
-			else return 'temps/default/'.$path;
+			return $folder.'/default'.$path;
 		}
 		
 		public function incBlock($name){ // Добавление блока на страницу
-			$fullName = 'temps/'.PANEL_THEME.'/blocks/'.$name.'/block.aptpl';
+			//$fullName = 'temps/'.PANEL_THEME.'/blocks/'.$name.'/block.aptpl';
+			$fullName = $this->getTplThemePath('temps', '/blocks/'.$name.'/block.aptpl');
 			if(file_exists($fullName)) include($fullName);
 		}
 		
@@ -562,6 +564,7 @@
 		}
 		
 		private function loadModules(){ // Подгрузка всех активных модулей
+		if(!isset($this->settings['core']['activeModules'])) return false;
 			$modules = $this->settings['core']['activeModules'];
 			foreach($modules as $k => $v){
 				if($v == true){

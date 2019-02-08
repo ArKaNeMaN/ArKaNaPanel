@@ -9,7 +9,7 @@ class DataBase {
 		$this->mysqli->query("SET NAMES '{$codirovka}'");
 	}
 	
-	public function query ( $query, $insert = false )
+	private function query ( $query, $insert = false )
 	{
 		if( !$insert )
 			return $this->mysqli->query( $query );
