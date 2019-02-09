@@ -1,0 +1,25 @@
+<?php if($this->isModuleActive('banlist')):?>
+	<div class="blockCont">
+		<div class="blockHead">Бан-лист</div>
+		<div class="blockBody blockScroll" style="height: 250px;">
+			<table>
+				<thead>
+					<th>Ник</th>
+					<th>Причина</th>
+					<th>Дата</th>
+				</thead>
+				<tbody>
+					<?php if($block_bans = $this->modules['banlist']->getBans(true, 1, $null, $this->settings['banlist']['blockItems'])):?>
+						<?php for($i = 0; $i < count($block_bans); $i++):?>
+							<tr>
+								<td><?php echo $block_bans[$i]['player_nick'];?></td>
+								<td><?php echo $block_bans[$i]['ban_reason'];?></td>
+								<td><?php echo $block_bans[$i]['ban_createdF'];?></td>
+							</tr>
+						<?php endfor;?>
+					<?php endif;?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+<?php endif;?>

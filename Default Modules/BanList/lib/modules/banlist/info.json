@@ -1,6 +1,6 @@
 {
 	"name": "Бан-лист (AmxBans)",
-	"version": "1.2",
+	"version": "1.3",
 	"author": "ArKaNeMaN",
 	"settPage": true,
 	"settTpl": true,
@@ -9,6 +9,9 @@
 		"lib/modules/banlist/settings.json",
 		"lib/modules/banlist/class.php",
 		"public/js/banlist.js",
-		"temps/default/banlist/index.aptpl"
+		"request/banlist.php",
+		"temps/default/banlist/index.aptpl",
+		"temps/default/blocks/banlist/info.json",
+		"temps/default/blocks/banlist/block.aptpl"
 	]
 }
