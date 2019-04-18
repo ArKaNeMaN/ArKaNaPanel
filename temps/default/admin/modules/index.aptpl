@@ -1,0 +1,23 @@
+<?php
+	$this->checkAccess(1);
+	$this->title = 'Менеджер модулей';
+	$modules = $this->getModules();
+?>
+
+<script src="<?php echo PANEL_HOME;?>public/js/modules.js" defer></script>
+<script>window.modules = <?php echo json_encode($modules);?></script>
+
+<div id="modulesModal"></div>
+
+<button style="float: right; font-weight: bold;" onclick="showModulesFromFiles(); return false;" class="styler"><i class="fa fa-plus"></i> Добавить модуль</button>
+<h2>Менеджер модулей</h2>
+<table>
+	<thead>
+		<th></th>
+		<th>Название</th>
+		<th>Версия</th>
+		<th>Автор</th>
+		<th>Действия</th>
+	</thead>
+	<tbody id="modulesList"></tbody>
+</table>

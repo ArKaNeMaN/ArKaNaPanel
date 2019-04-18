@@ -1,0 +1,65 @@
+<?$this->checkAccess(1);?>
+<?$this->title = 'Менеджер серверов';?>
+
+<script src="<?php echo PANEL_HOME;?>public/js/servers.js"></script>
+
+<div id="serversEditModal" class="modal-custom"></div>
+
+<script>
+	window.gamesList = <?php echo json_encode($this->gamesList);?>;
+</script>
+
+<h2>Менеджер серверов</h2>
+<div style="margin-left: 15px;">
+	<h3>Сервера</h3>
+	<table style="margin-left: 5px;">
+		<thead>
+			<th>Игра</th>
+			<th>Название</th>
+			<th>Адрес</th>
+			<th>Актив</th>
+			<th></th>
+		</thead>
+		<tbody id="serversAdminList">
+			<?if($servers = $this->getServers(false)):?>
+				<?for($i = 0; $i < count($servers); $i++):?>
+					<tr id="serversAdminListItem-<?=$servers[$i]['id']?>">
+						<td id="serversAdminGameName" game="<?=$servers[$i]['game']?>"><?=$servers[$i]['gameName']?></td>
+						<td id="serversAdminName"><?=$servers[$i]['name']?></td>
+						<td id="serversAdminFullAddress"><?=$servers[$i]['fullAddress']?></td>
+						<td id="serversAdminActive" active="<?=$servers[$i]['active']?>"><i class="fa fa-<?=($servers[$i]['active'] ? 'check' : 'times')?>"></i></td>
+						<td><button class="styler" id="serversAdminEditBtn" onclick="clickServerEdit(<?=$servers[$i]['id']?>); return false;"><i class="fa fa-wrench"></i></button></td>
+					</tr>
+				<?endfor;?>
+			<?else:?>
+				<tr><td colspan="5"></div align=center>Пусто</div></td></tr>
+			<?endif;?>
+		</tbody>
+	</table>
+	<h3>Добавить сервер</h3>
+	<div style="margin-left: 5px;">
+		<table>
+			<thead>
+				<th>Игра</th>
+				<th>Название</th>
+				<th>Адрес</th>
+				<th>Актив</th>
+				<th></th>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						<select id="serversAdminAddGame" class="styler" data-search-limit="7" data-visible-options="5" data-search="true">
+							<?foreach($this->gamesList as $k => $v) echo '<option value="'.$k.'" '.($k == 1 ? 'selected' : '').'>'.$v['name'].'</option>'?>
+						</select>
+					</td>
+					<td><input id="serversAdminAddName" type="text" class="styler" placeholder="Название" /></td>
+					<td><input id="serversAdminAddAddress" type="text" class="styler" placeholder="Адрес IP:PORT" /></td>
+					<td><input id="serversAdminAddActive" type="checkbox" class="lc-switch" /></td>
+					<td><button id="serversAdminAddBtn" class="styler">Добавить</button></td>
+				</tr>
+			</tbody>
+		</table>
+		<div id="serversAdminStatusMsgPlace" class="statusMsg" status=""></div>
+	</div>
+</div>

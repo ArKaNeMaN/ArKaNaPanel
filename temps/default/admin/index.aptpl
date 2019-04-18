@@ -1,0 +1,109 @@
+<?php
+	$this->checkAccess(1);
+	$this->title = 'Настройка панели';
+	
+	require 'lib/panelSettings.php';
+?>
+
+<h2>Настройка панели</h2>
+
+<script src="<?php echo PANEL_HOME;?>public/js/adminMain.js"></script>
+
+<script>window.tplSets = [];</script>
+
+<table id="tplSettsCont">
+	<?php for($i = 0; $i < count($tpl); $i++):?>
+		<tr><td colspan="2" style="text-align: center;"><?php echo $tpl[$i]['name'];?></td></tr>
+		<?php if(isset($tpl[$i]['custom']) && $tpl[$i]['custom']):?>
+			<tr>
+				<td colspan="2" style="text-align: center;">
+					<?php
+						if(!isset($tpl[$i]['customFile'])) echo 'Путь до файла кастомной настройки не указан';
+						else if(file_exists($tpl[$i]['customFile'])) require $this->homePath.$tpl[$i]['customFile'];
+						else echo 'Файл кастомной настройки не найден';
+					?>
+				</td>
+			</tr>
+		<?php else:?>
+			<?php for($k = 0; $k < count($tpl[$i]['items']); $k++):?>
+				<script>window.tplSets.push({id: '<?php echo $tpl[$i]['items'][$k]['id'];?>', type: '<?php echo $tpl[$i]['items'][$k]['type'];?>'});</script>
+				<tr>
+					<td><?php echo $tpl[$i]['items'][$k]['name'];?></td>
+					<td>
+						<?php if($tpl[$i]['items'][$k]['type'] != 'custom'):?>
+							<input 
+								type="<?php echo $tpl[$i]['items'][$k]['type'];?>" 
+								class="w100 <?php echo $tpl[$i]['items'][$k]['type'] == 'checkbox' ? 'lc-switch' : 'styler';?>" 
+								<?php if(isset($this->settings['core'][$tpl[$i]['items'][$k]['id']])):?>
+									<?php if($tpl[$i]['items'][$k]['type'] == 'checkbox'):?>
+										<?php echo !empty($this->settings['core'][$tpl[$i]['items'][$k]['id']]) ? ($this->settings['core'][$tpl[$i]['items'][$k]['id']] ? 'checked' : '') : ($tpl[$i]['items'][$k]['default'] ? 'checked' : '');?> 
+									<?php else:?>
+										value="<?php echo !empty($this->settings['core'][$tpl[$i]['items'][$k]['id']]) ? $this->settings['core'][$tpl[$i]['items'][$k]['id']] : (isset($tpl[$i]['items'][$k]['default']) ? $tpl[$i]['items'][$k]['default'] : '');?>" 
+									<?php endif;?>
+								<?php endif;?>
+								<?php if($tpl[$i]['items'][$k]['type'] != 'checkbox'):?>
+									placeholder="<?php echo $tpl[$i]['items'][$k]['placeholder'];?>" 
+								<?php endif;?>
+								id="adminTpl<?php echo $tpl[$i]['items'][$k]['id'];?>" 
+							/>
+						<?php else:?>
+							<?php
+								if(!isset($tpl[$i]['items'][$k]['customFile'])) echo 'Путь до файла кастомной настройки не указан';
+								else if(file_exists($tpl[$i]['items'][$k]['customFile'])) require $this->homePath.$tpl[$i]['items'][$k]['customFile'];
+								else echo 'Файл кастомной настройки не найден';
+							?>
+						<?php endif;?>
+					</td>
+				</tr>
+			<?php endfor;?>
+		<?php endif;?>
+	<?php endfor;?>
+	<tr><td colspan="2"><div align=center><button onclick="saveTplSettings()" class="styler">Сохранить</button></div></td></tr>
+</table>
+
+<!--
+
+<script src="<?php echo PANEL_HOME;?>public/js/adminMain.js"></script>
+
+<h2>Настройка панели</h2>
+
+<table id="adminMainPanel">
+	<tr><td colspan="2" style="text-align: center;">Основное</td></tr>
+	<tr>
+		<td style="width: auto;">Название сайта</td>
+		<td><input class="styler w100" type="text" placeholder="Название сайта" id="adminMainSiteName" value="<?=$this->settings['core']['siteName']?>"></td>
+	</tr>
+	<tr>
+		<td style="width: auto;">Начальная страница</td>
+		<td><input class="styler w100" type="text" placeholder="Начальная страница" id="adminMainHomePage" value="<?=$this->settings['core']['homePage']?>"></td>
+	</tr>
+	<tr>
+		<td style="width: auto;">Шаблон</td>
+		<td><input class="styler w100" type="text" placeholder="Шаблон" id="adminMainPanelTheme" value="<?=$this->settings['core']['panelTheme']?>"></td>
+	</tr>
+	<tr>
+		<td style="width: auto;">Сжимать аватарки?</td>
+		<td><input class="lc-switch" type="checkbox" id="adminMainZipAvatars" <?php echo $this->settings['core']['zipAvatars'] ? 'checked' : ''?>></td>
+	</tr>
+	<tr><td colspan="2" style="text-align: center;">Метрика</td></tr>
+	<tr>
+		<td style="width: auto;">Номер счётчика Яндекс.Метрики</td>
+		<td><input class="styler w100" type="number" placeholder="Отсавьте пустым, чтобы отключить" id="adminMainYaMetrika" value="<?=$this->settings['core']['yaMetrika']?>"></td>
+	</tr>
+	<tr>
+		<td style="width: auto;">ID отслеживания Google Аналитики</td>
+		<td><input class="styler w100" type="text" placeholder="Отсавьте пустым, чтобы отключить" id="adminMainGoogleAnalytics" value="<?=$this->settings['core']['googleAnalytics']?>"></td>
+	</tr>
+	<tr><td colspan="2" style="text-align: center;">Капча (ReCAPTCHA v2 Invisible)</td></tr>
+	<tr>
+		<td style="width: auto;">ReCAPTCHA (Публичный ключ)</td>
+		<td><input class="styler w100" type="text" placeholder="Публичный ключ капчи" id="adminMainCaptchaPubKey" value="<?php echo $this->settings['core']['captchaPubKey'];?>"></td>
+	</tr>
+	<tr>
+		<td style="width: auto;">ReCAPTCHA (Секретный ключ)</td>
+		<td><input class="styler w100" type="text" placeholder="Секретный ключ капчи" id="adminMainCaptchaSecKey" value="<?php echo $this->settings['core']['captchaSecKey'];?>"></td>
+	</tr>
+	<tr><td colspan="2"><div align=center><button class="styler" id="adminMainSaveBtn">Сохранить</button></div></td></tr>
+</table>
+
+-->

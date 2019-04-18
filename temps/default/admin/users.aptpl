@@ -1,0 +1,18 @@
+<?php
+	$this->checkAccess(1);
+	$this->title = 'Список пользователей';
+?>
+
+<div id="usersModal"></div>
+
+<h2>Список пользователей</h2>
+
+<table>
+	<thead>
+		<th>ID</th>
+		<th>Логин</th>
+		<th>Ник</th>
+		<th>Группа</th>
+	</thead>
+	<tbody id="usersList"></tbody>
+</table>

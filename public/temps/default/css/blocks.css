@@ -1,0 +1,73 @@
+.blockCont{
+	margin-bottom: 15px;
+	overflow: hidden;
+	border-radius: 8px;
+}
+
+.blockCont .blockHead{
+	border-radius: 8px 8px 0 0;
+	background-color: rgba(20, 20, 20, .9);
+	text-align: left;
+	padding: 10px;
+}
+
+.blockCont .blockBody{
+	border-radius: 0 0 8px 8px;
+	background-color: rgba(30, 30, 30, .8);
+	padding: 10px;
+}
+
+.blockScroll{
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.blockScroll::-webkit-scrollbar-button{
+	background-image:url('');
+	background-repeat:no-repeat;
+	width:5px;
+	height:0px;
+}
+
+.blockScroll::-webkit-scrollbar-track{
+	background-color:#0000
+}
+
+.blockScroll::-webkit-scrollbar-thumb{
+	-webkit-border-radius: 0px;
+	border-radius: 0px;
+	background-color: rgba(40, 40, 40, .9);
+}
+
+.blockScroll::-webkit-scrollbar-thumb:hover{
+	background-color: rgb(50, 50, 50);
+}
+
+.blockScroll::-webkit-resizer{
+	background-image:url('');
+	background-repeat:no-repeat;
+	width:4px;
+	height:0px;
+}
+
+.blockScroll::-webkit-scrollbar{
+	width: 4px;
+}
+
+/*Админка*/
+
+ul.blocksActionsMenu{
+	border-radius: 5px;
+	background-color: white;
+	border: 1px solid rgba(200, 200, 200, .7);
+}
+
+ul.blocksActionsMenu li{
+	padding: 10px;
+	cursor: pointer;
+	text-align: left;
+}
+
+ul.blocksActionsMenu li:hover{
+	background-color: rgba(100, 100, 100, .3);
+}
