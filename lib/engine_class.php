@@ -2,13 +2,13 @@
 	class engine{
 		
 		private $isRequest = false; // true если класс объявлен в реквесте (Указывается вручную при объявлении класса)
-		private $debug = false;
+		private $debug = true;
 		
 		protected $pageContent; // Содержимое страницы
 		
 		public $error = ''; // Код ошибки
 		public $homePath = ''; // Корневая папка панели (Используется для инклюда)
-		public $userid; // ID авторизованного пользователя (Для гостей null)
+		public $userid = 0; // ID авторизованного пользователя (Для гостей null)
 		public $sql; // Объект класса для работы с БД
 		public $userInfo; // Информация об авторизованном пользователе (Для гостей false)
 		public $modules; // Массив с объектами классов всех подгруженным модулей
@@ -222,16 +222,12 @@
 		
 		public function getBlocks(){
 			$res = $this->sql->select('blocks', '*');
-			//for($i = 0; $i < count($res); $i++){
-			//	$res[$i]['data'] = json_decode($res[$i]['data']);
-			//}
 			return $res;
 		}
 		
 		public function getBlock($index){
 			if(!$this->isBlockInstalled($index)) return false;
 			$res = $this->sql->select('blocks', '*', ['index' => $index])[0];
-			//$res['data'] = json_decode($res['data'], true);
 			return $res;
 		}
 		
@@ -850,6 +846,10 @@
 			}
 		}
 		
+		public function updateModule($index){
+			
+		}
+		
 		public function turnModule($index, $turn, &$err = 0){
 			if(!$this->isRegisteredModule($index, $err)) return false;
 			$this->sql->update('modules', ['status' => $turn ? 1 : 0], ['index' => $index]);
@@ -915,6 +915,43 @@
 			if(!$this->isRegisteredModule($index, $err)) return false;
 			$this->sql->delete('modules', ['index' => $index]);
 			return !$this->isRegisteredModule($index);
+		}
+		
+		//--------------------| Логи |--------------------//
+		
+		public function addLog($module, $type, $text, $data = []){
+			return $this->sql->insert('logs', [
+				'userid' => $this->userid,
+				'module' => $module,
+				'type' => $type,
+				'text' => $text,
+				'time' => time(),
+				'data' => json_encode($data),
+			]);
+		}
+		
+		public function getLogs($page = 1, $items = 20, $module = null, $type = null, &$err = 0){
+			$where = [];
+			if($module) $where['module'] = $module;
+			if($type) $where['type'] = $type;
+			if($where == []) $where = '';
+			$total = $this->getLogsCount($module, $type);
+			$totalPages = round($total/$items, 0, PHP_ROUND_HALF_UP);
+			$page = max(min($totalPages, $page), 1);
+			$res = $this->sql->select('logs', '*', $where, 'time', false, ($page-1)*$items.', '.$items);
+			if(!$res){
+				$err = 'Не найдено ни одного лога';
+				return false;
+			}
+			return $res;
+		}
+		
+		public function getLogsCount($module = null, $type = null){
+			$where = [];
+			if($module) $where['module'] = $module;
+			if($type) $where['type'] = $type;
+			if($where == []) $where = '';
+			return $this->sql->select('logs', ['COUNT(*)'], $where)[0]['COUNT(*)'];
 		}
 		
 		//--------------------| Для моддинга |--------------------//

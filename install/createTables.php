@@ -59,6 +59,7 @@
 			`ip` varchar(16) COLLATE utf8_unicode_ci NOT NULL,
 			`port` smallint(6) NOT NULL,
 			`data` text COLLATE utf8_unicode_ci,
+			`settings` text COLLATE utf8_unicode_ci,
 			`active` tinyint(1) NOT NULL DEFAULT '1',
 			PRIMARY KEY (`id`),
 			UNIQUE KEY `ip` (`ip`,`port`),
@@ -108,6 +109,19 @@
 			`settingsPage` varchar(256) COLLATE utf8_unicode_ci DEFAULT NULL,
 			PRIMARY KEY (`id`),
 			UNIQUE KEY `index` (`index`),
+			KEY `id` (`id`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
+	");
+	
+	$sql->query("
+		CREATE TABLE IF NOT EXISTS `".$_POST['prefix']."logs` (
+			`id` int(11) NOT NULL AUTO_INCREMENT,
+			`userid` int(11) NOT NULL DEFAULT '0',
+			`module` varchar(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'core',
+			`type` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+			`text` text COLLATE utf8_unicode_ci NOT NULL,
+			`data` text COLLATE utf8_unicode_ci,
+			PRIMARY KEY (`id`),
 			KEY `id` (`id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 	");
