@@ -4,8 +4,8 @@
 	$homePageBlocks = json_decode($this->settings['core']['blocks']['homePage'], true);
 	function homePageBlocks_sortFunc($a, $b){return ($a['pos'] > $b['pos']);}
 	uasort($homePageBlocks, 'homePageBlocks_sortFunc');
-	foreach($homePageBlocks as $v) if($this->getBlockInfo($v['block'])['allowHomePage']) $this->incBlock($v['block']);
+	foreach($homePageBlocks as $v){
+		$blockInfo = $this->getBlock($v['block']);
+		if($blockInfo['homePage']) $this->incBlock_($v['block']);
+	}
 ?>
-
-<?//$this->incBlock('monitoring');?>
-<?//$this->incBlock('helloWorld');?>
