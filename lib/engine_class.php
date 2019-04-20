@@ -2,7 +2,7 @@
 	class engine{
 		
 		private $isRequest = false; // true если класс объявлен в реквесте (Указывается вручную при объявлении класса)
-		private $debug = true;
+		private $debug = false;
 		
 		protected $pageContent; // Содержимое страницы
 		
@@ -276,7 +276,6 @@
 			
 			$contFile = $this->homePath.'temps/default/blocks/'.$data['index'].'/block.aptpl';
 			$data['content'] = '';
-			if(!isset($data['data'])) $data['data'] = [];
 			
 			switch($data['type']){
 				case 'file': {
@@ -291,7 +290,7 @@
 				}
 			}
 			
-			$result = $this->installBlock($data['index'], $data['type'], $data['content'], $data['name'], $data['module'], $data['rightCol'], $data['homePage'], $data['data']);
+			$result = $this->installBlock($data['index'], $data['type'], $data['content'], $data['name'], $data['module'], $data['rightCol'], $data['homePage']);
 			return $more ? [
 				'status' => $result, 'msg' => $result ? 'Успех! Блок установлен' : 'Ошибка! Ошибка установки блока'
 			] : $result;
@@ -306,7 +305,7 @@
 				file	Контент блока хранится в файле. Параметр $content игнорируется.
 		*/
 		
-		public function installBlock($index, $type = 'file', $content = '', $name = 'Unnamed', $module = 'custom', $rightCol = true, $homePage = false, $data = []){
+		public function installBlock($index, $type = 'file', $content = '', $name = 'Unnamed', $module = 'custom', $rightCol = true, $homePage = false){
 			$id = $this->sql->insert('blocks', [
 				'index' => $index,
 				'name' => $name,
@@ -315,7 +314,6 @@
 				'type' => $type,
 				'rightCol' => (int) $rightCol,
 				'homePage' => (int) $homePage,
-				'data' => json_encode($data),
 			]);
 			if(!$id) return false;
 			return $id;
