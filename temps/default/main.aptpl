@@ -22,6 +22,7 @@
 		
 		<!--JS-->
 		<script>window.panelHome = '<?php echo PANEL_HOME?>';</script>
+		<script>window.waitMeSettings = {effect:'stretch',bg:'rgba(30, 30, 30, .5)',color:'rgba(100, 100, 100, .8)'};</script>
 		<script src="<?php echo PANEL_HOME?>public/js/main.js"></script>
 		<?php if($this->settings['core']['captchaPubKey'] && $this->settings['core']['captchaSecKey']):?>
 			<script src='https://www.google.com/recaptcha/api.js' defer></script>
