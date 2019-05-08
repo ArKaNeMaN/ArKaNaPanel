@@ -943,7 +943,9 @@
 			if(isset($data['name'])) $data_['name'] = $data['name'];
 			if(isset($data['needInstall']) && $data['needInstall']) $data_['status'] = -1;
 			
-			return $this->sql->insert('modules', $data_);
+			$id = $this->sql->insert('modules', $data_);
+			if($id) $this->addLog('core', 'regModule', 'Добавлен модуль '.$data_['name'].'['.$data_['index'].'].', $data_);
+			return $id;
 		}
 		
 		public function installModule($index, &$err = 0){ // Установка модуля
