@@ -6,7 +6,7 @@
 			`name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
 			`email` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,
 			`pass` varchar(33) COLLATE utf8_unicode_ci NOT NULL,
-			`custom` text COLLATE utf8_unicode_ci,
+			`data` text COLLATE utf8_unicode_ci,
 			`regIp` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
 			`lastIp` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
 			`userHash` varchar(33) COLLATE utf8_unicode_ci DEFAULT NULL,

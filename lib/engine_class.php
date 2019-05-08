@@ -462,7 +462,7 @@
 		
 		public function getUserInfo($userid){ // Получение информации об аккаунте
 			$res = $this->sql->select('users', '*', ['id' => $userid], 'id', true, 1)[0];
-			if($res != '') $res['custom'] = json_decode($res['custom'], true);
+			if($res != '') $res['data'] = json_decode($res['data'], true);
 			$res['pass'] = null;
 			return $res;
 		}
@@ -572,14 +572,13 @@
 			return true;
 		}
 		
-		public function editUserCustomData($id, $module, $data, $more = false){
-			if(!$data) 
+		public function editUserData($id, $module, $data, $more = false){
 			if(!$data) 
 			
-			$res = json_decode($this->sql->select('users', ['custom'], ['id' => $id])[0]['custom'], true);
+			$res = json_decode($this->sql->select('users', ['data'], ['id' => $id])[0]['data'], true);
 			$newData[$module] = array_replace_recursive($res[$module], $data);
 			
-			$this->sql->update('users', ['custom' => $newData], ['id' => $id]);
+			$this->sql->update('users', ['data' => $newData], ['id' => $id]);
 			
 		}
 		
