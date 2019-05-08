@@ -59,7 +59,7 @@
 			page = Math.max(page, 1);
 			$.ap.addGetParam('p', page);
 			return page;
-		}
+		},
 	};
 	
 	$.fn.apPagination = function(page, total, click = '$.ap.changePage'){

@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once('../lib/engine_class.php');
 	$eng = new engine(true);
 	
@@ -27,4 +27,4 @@
 			$eng->setModuleSettings('core', $data);
 			return $eng->ajaxReturn(['status' => true, 'msg' => 'Успех! Настройки сохранены']);
 		}
-	}
+?>
