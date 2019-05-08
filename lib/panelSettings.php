@@ -31,6 +31,15 @@
 					'placeholder' => '',
 					'default' => false,
 				],
+				[
+					'id' => 'logo',
+					'name' => 'Логотип',
+					'type' => 'file',
+					'uploadFolder' => 'panel',
+					'fileName' => 'logo.png',
+					'fileType' => 'image',
+					'fileExp' => 'png',
+				],
 			],
 		],
 		[
