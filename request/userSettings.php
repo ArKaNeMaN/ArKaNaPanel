@@ -14,9 +14,9 @@
 				$res = $eng->uploadFile($_FILES['file'], $eng->userid.'-'.time().'.jpg', 'avatars', 'image', 'jpg', true);
 				if($res['status']){
 					unlink($eng->homePath.$eng->getUserInfo($eng->userid)['avatar']);
-					$ress = $eng->editUserInfo($eng->userid, ['avatar' => $res['data']], true);
-					if($ress['status']) $eng->ajaxReturn(['status' => true, 'msg' => 'Успех! Аватар загружен', 'data' => $res['data']]);
-					else return $eng->ajaxReturn($ress);
+					
+					$status = $eng->editUserInfo($eng->userid, ['avatar' => $res['data']], $err);
+					$eng->ajaxReturnStatus($status, $status ? 'Аватар сохранён' : $err, $status ? $res['data'] : null);
 				}
 				else return $eng->ajaxReturn($res);
 			}
@@ -24,13 +24,12 @@
 		}
 		
 		case 'saveMain': {
-			$data = [
-				'name' => $_POST['name']
-			];
+			$data = ['name' => $_POST['name']];
 			
 			if(empty($data['name'])) $eng->ajaxReturn(['status' => false, 'msg' => 'Ошибка! Введите ник']);
 			
-			$eng->ajaxReturn($eng->editUserInfo($eng->userid, $data, true));
+			$status = $eng->editUserInfo($eng->userid, $data, $err);
+			$eng->ajaxReturnStatus($status, $status ? 'Настройки сохранены' : $err);
 		}
 		
 		case 'changePass': {
@@ -39,7 +38,8 @@
 			if($_POST['newPass'] != $_POST['newPassa']) $eng->ajaxReturn(['status' => false, 'msg' => 'Ошибка! Пароли не совпадают']);
 			if(!$eng->sql->select('users', ['COUNT(*)'], ['id' => $eng->userid, 'pass' => md5($_POST['oldPass'])])[0]['COUNT(*)']) $eng->ajaxReturn(['status' => false, 'msg' => 'Ошибка! Старый пароль указан неверно']);
 			
-			$eng->ajaxReturn($eng->editUserInfo($eng->userid, ['pass' => $_POST['newPass']], true));
+			$status = $eng->editUserInfo($eng->userid, ['pass' => $_POST['newPass']], $err);
+			$eng->ajaxReturnStatus($status, $status ? 'Пароль изменён' : $err);
 		}
 		
 		default: {$eng->ajaxReturn(['status' => false, 'msg' => 'Ошибка! Undefined action']);}
