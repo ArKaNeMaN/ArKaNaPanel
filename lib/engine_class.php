@@ -473,6 +473,18 @@
 			return $res;
 		}
 		
+		public function getUsers($page = 1, $items = 15){
+			$total = $this->sql->select('users', ['COUNT(*)'])[0]['COUNT(*)'];
+			$totalPages = round($total/$items, 0, PHP_ROUND_HALF_UP);
+			$page = max(min($totalPages, $page), 1);
+			$res = $this->sql->select('users', '*', '', '`id`', false, ($page-1)*$items.', '.$items);
+			for($i = 0; $i < count($res); $i++){
+				$res[$i]['data'] = json_decode($res[$i]['data'], true);
+				$res[$i]['groupInfo'] = $res[$i]['data'];
+			}
+			return $res;
+		}
+		
 		public function getLastUser(){ // Получение идентификатора последнего зарегистрированного пользователя [НАДО ПЕРЕНЕСТИ В ОТДЕЛЬНЫЙ МОДУЛЬ]
 			return $this->getUserInfo($this->sql->select('users', ['id'], '', 'id', false, 1)[0]['id']);
 		}
