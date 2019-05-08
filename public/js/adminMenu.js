@@ -1,87 +1,32 @@
 var isRequestProc = false;
 var modalInfo = null;
 
-$(document).ready(function(){
-	/* import { Sortable } from '@shopify/draggable';
-	const sortableSub = new Sortable(document.querySelectorAll('ul.adminMenu li ul'), {
-		draggable: 'ul.adminMenu li ul li'
-	});
-	const sortableMain = new Sortable(document.querySelectorAll('ul.adminMenu'), {
-		draggable: 'ul.adminMenu li'
-	}); */
-});
-
 var canClick = true;
 function adminMenuEdit(id){
 	if(!canClick) return false;
 	canClick = false; setTimeout(function(){canClick = true;}, 1);
-	if(isRequestProc) return false;
-	$("#menuModal").iziModal({
-		title: 'Настройка пункта меню',
-		subtitle: '',
+	$('#menuModal').iziModal({
 		headerColor: 'rgb(20, 20, 20)',
 		background: 'rgb(30, 30, 30)',
-		theme: 'dark',  // light
+		theme: 'dark',
+		width: 650,
 		icon: 'fa fa-list-ul',
-		iconText: null,
-		iconColor: '',
-		rtl: false,
-		width: 600,
-		top: null,
-		bottom: null,
-		borderBottom: true,
 		padding: 20,
 		radius: 5,
-		zindex: 1000,
-		iframe: false,
-		iframeHeight: 400,
-		iframeURL: null,
-		focusInput: true,
-		group: 'custom',
-		loop: false,
-		arrowKeys: true,
-		navigateCaption: false,
-		navigateArrows: false, // Boolean, 'closeToModal', 'closeScreenEdge'
-		history: false,
-		restoreDefaultContent: false,
-		autoOpen: true, // Boolean, Number
-		bodyOverflow: false,
-		fullscreen: false,
-		openFullscreen: false,
-		closeOnEscape: true,
-		closeButton: true,
-		appendTo: 'body', // or false
-		appendToOverlay: 'body', // or false
-		overlay: true,
-		overlayClose: true,
-		overlayColor: 'rgba(0, 0, 0, .4)',
-		timeout: false,
-		timeoutProgressbar: false,
-		pauseOnHover: false,
-		timeoutProgressbarColor: 'rgba(255,255,255,0.5)',
-		transitionIn: 'comingIn',
-		transitionOut: 'comingOut',
-		transitionInOverlay: 'fadeIn',
-		transitionOutOverlay: 'fadeOut',
-		onFullscreen: function(){},
-		onResize: function(){},
+		title: 'Настройка пункта меню',
+		autoOpen: true,
 		onOpening: function(){
 			$('#menuModal').iziModal('startLoading');
-			isRequestProc = true;
-			$.ajax({
-				url: window.panelHome+'request/adminMenu.php?action=getMenuItem',
-				dataType: 'json',
-				type: 'POST',
-				data: {id: id},
-				success: function(res){
-					isRequestProc = false;
+			$.ap.sendRequest(
+				'adminMenu', 'getMenuItem',
+				{id: id},
+				(res) => {
 					$('#menuModal').iziModal('stopLoading');
 					if(res instanceof Object){
 						if(res.status){
-							iziToast.success({title: res.msg});
 							modalInfo = res.data;
 							
-							accessStr = '';
+							accessStr = '<option value="0">Все</option>';
 							for(var i = 0; i < window.userGroups.length; i++) accessStr += '<option value="'+window.userGroups[i].id+'">'+window.userGroups[i].name+'</option>'
 							
 							$('#menuModal').iziModal('setSubtitle', modalInfo.name+' (ID: '+modalInfo.id+')');
@@ -90,23 +35,23 @@ function adminMenuEdit(id){
 									<tbody>\
 										<tr>\
 											<td>Позиция</td>\
-											<td><input id="adminMenuPosInp" class="styler" type="number" min="1" value="'+modalInfo.pos+'"></td>\
+											<td><input id="adminMenuPosInp" class="styler w100" type="number" min="1" value="'+modalInfo.pos+'"></td>\
 										</tr>\
 										<tr>\
 											<td>Доступ</td>\
 											<td>\
-												<select id="adminMenuAccessInp" class="styler">\
+												<select id="adminMenuAccessInp" class="styler w100">\
 													'+accessStr+'\
 												</select>\
 											</td>\
 										</tr>\
 										<tr>\
 											<td>Название</td>\
-											<td><input id="adminMenuNameInp" class="styler" type="text" value="'+modalInfo.name+'"></td>\
+											<td><input id="adminMenuNameInp" class="styler w100" type="text" value="'+modalInfo.name+'"></td>\
 										</tr>\
 										<tr>\
 											<td>Ссылка</td>\
-											<td><input id="adminMenuLinkInp" class="styler" type="text" value="'+modalInfo.link+'"></td>\
+											<td><input id="adminMenuLinkInp" class="styler w100" type="text" value="'+modalInfo.link+'"></td>\
 										</tr>\
 										<tr>\
 											<td>Подменю</td>\
@@ -114,7 +59,7 @@ function adminMenuEdit(id){
 										</tr>\
 										<tr>\
 											<td>ID Родителя</td>\
-											<td><input id="adminMenuParentInp" class="styler" type="number" min="0" value="'+modalInfo.parent+'" '+(modalInfo.submenu instanceof Object ? 'disabled' : '')+'></td>\
+											<td><input id="adminMenuParentInp" class="styler w100" type="number" min="0" value="'+modalInfo.parent+'" '+(modalInfo.submenu instanceof Object ? 'disabled' : '')+'></td>\
 										</tr>\
 										<tr>\
 											<td>Актив</td>\
@@ -124,7 +69,7 @@ function adminMenuEdit(id){
 								</table>\
 								<br>\
 								<button class="styler" id="modalMenuItemSaveBtn" style="float: left; font-weight: bold;"><i class="fa fa-save"></i> Сохранить</button>\
-								<button class="styler" id="modalMenuItemDelBtn" style="float: right; color: red; font-weight: bold;"><i class="fa fa-trash"></i> Удалить</button>\
+								<button class="styler" onclick="deleteMenuItem('+modalInfo.id+');" id="modalMenuItemDelBtn" style="float: right; color: red; font-weight: bold;"><i class="fa fa-trash"></i> Удалить</button>\
 							');
 							setTimeout(function(){$('.styler').styler();}, 1);
 							$('.lc-switch').lc_switch('Вкл', 'Выкл');
@@ -133,81 +78,33 @@ function adminMenuEdit(id){
 							$('#adminMenuAccessInp [value="'+modalInfo.group+'"]').attr('selected', '');
 							
 							$('#modalMenuItemSaveBtn').click(function(){
-								if(!isRequestProc){
-									$('#menuModal').iziModal('startLoading');
-									isRequestProc = true;
-									$.ajax({
-										url: window.panelHome+'request/adminMenu.php?action=editMenuItem',
-										dataType: 'json',
-										type: 'POST',
-										data: {
-											id: modalInfo.id,
-											pos: $('#adminMenuPosInp').val(),
-											access: $('#adminMenuAccessInp').val(),
-											name: $('#adminMenuNameInp').val(),
-											link: $('#adminMenuLinkInp').val(),
-											submenu: Number($('#adminMenuSubmenuInp').is(':checked')),
-											parent: $('#adminMenuParentInp').val(),
-											active: Number($('#adminMenuActiveInp').is(':checked')),
-										},
-										success: function(res){
-											isRequestProc = false;
-											$('#menuModal').iziModal('stopLoading');
-											if(res instanceof Object){
-												if(res.status){
-													reloadMenuItemsList();
-													iziToast.success({title: res.msg});
-												}
-												else iziToast.error({title: res.msg});
+								var req = $.ap.sendRequest(
+									'adminMenu', 'editMenuItem',
+									{
+										id: modalInfo.id,
+										pos: $('#adminMenuPosInp').val(),
+										access: $('#adminMenuAccessInp').val(),
+										name: $('#adminMenuNameInp').val(),
+										link: $('#adminMenuLinkInp').val(),
+										submenu: Number($('#adminMenuSubmenuInp').is(':checked')),
+										parent: $('#adminMenuParentInp').val(),
+										active: Number($('#adminMenuActiveInp').is(':checked')),
+									},
+									(res) => {
+										$('#menuModal').iziModal('stopLoading');
+										if(res instanceof Object){
+											if(res.status){
+												reloadMenuItemsList();
+												iziToast.success({title: res.msg});
 											}
-											else{
-												console.log(res);
-												iziToast.error({title: 'Возникла непредвиденная ошибка'});
-											}
-										},
-										timeout: 5000,
-										error: function(jqXHR, status, errorThrown){
-											$('#menuModal').iziModal('stopLoading');
-											isRequestProc = false;
-											alert('Ошибка! '+status+': '+errorThrown);
+											else iziToast.error({title: res.msg});
 										}
-									});
-								}
-							});
-							
-							$('#modalMenuItemDelBtn').click(function(){
-								if(!isRequestProc){
-									$('#menuModal').iziModal('startLoading');
-									isRequestProc = true;
-									$.ajax({
-										url: window.panelHome+'request/adminMenu.php?action=deleteMenuItem',
-										dataType: 'json',
-										type: 'POST',
-										data: {id: modalInfo.id},
-										success: function(res){
-											isRequestProc = false;
-											$('#menuModal').iziModal('stopLoading');
-											if(res instanceof Object){
-												if(res.status){
-													reloadMenuItemsList();
-													iziToast.success({title: res.msg});
-													$('#menuModal').iziModal('close');
-												}
-												else iziToast.error({title: res.msg});
-											}
-											else{
-												console.log(res);
-												iziToast.error({title: 'Возникла непредвиденная ошибка'});
-											}
-										},
-										timeout: 5000,
-										error: function(jqXHR, status, errorThrown){
-											$('#menuModal').iziModal('stopLoading');
-											isRequestProc = false;
-											alert('Ошибка! '+status+': '+errorThrown);
-										}
-									});
-								}
+										else iziToast.error({title: 'Возникла непредвиденная ошибка'});
+									},
+									() => {$('#menuModal').iziModal('stopLoading');},
+									true
+								);
+								if(req) $('#menuModal').iziModal('startLoading');
 							});
 						}
 						else{
@@ -221,20 +118,35 @@ function adminMenuEdit(id){
 						iziToast.error({title: 'Возникла непредвиденная ошибка'});
 					}
 				},
-				timeout: 5000,
-				error: function(jqXHR, status, errorThrown){
-					$('#menuModal').iziModal('close');
-					isRequestProc = false;
-					alert('Ошибка! '+status+': '+errorThrown);
-				}
-			});
+				() => {$('#menuModal').iziModal('close');},
+				true
+			);
 		},
-		onOpened: function(){},
-		onClosing: function(){},
 		onClosed: function(){modalInfo = null; $('#menuModal').iziModal('destroy');},
-		afterRender: function(){}
 	});
 	return true;
+}
+
+function deleteMenuItem(id){
+	var req = $.ap.sendRequest(
+		'adminMenu', 'deleteMenuItem',
+		{id: id},
+		(res) => {
+			$('#menuModal').iziModal('stopLoading');
+			if(res instanceof Object){
+				if(res.status){
+					reloadMenuItemsList();
+					iziToast.success({title: res.msg});
+					$('#menuModal').iziModal('close');
+				}
+				else iziToast.error({title: res.msg});
+			}
+			else iziToast.error({title: 'Возникла непредвиденная ошибка'});
+		},
+		() => {$('#menuModal').iziModal('stopLoading');},
+		true
+	);
+	if(req) $('#menuModal').iziModal('startLoading');
 }
 
 function clickAddMenuItem(){
@@ -316,10 +228,8 @@ function menuItemsTpl(data){
 				<span style="margin-right: 5px; font-weight: bold;">'+data[i].name+'</span>\
 				<span>'+(empty(data[i].link) ? '' : '('+data[i].link+')')+'</span>\
 		';
-		
 		if(data[i].submenu instanceof Array){
 			str += '<ul>';
-			
 			for(var k = 0; k < data[i].submenu.length; k++){
 				str += '\
 					<li onclick="adminMenuEdit('+data[i].submenu[k].id+'); return false;">\
@@ -331,7 +241,6 @@ function menuItemsTpl(data){
 					</li>\
 				';
 			}
-			
 			str += '</ul>';
 		}
 		str += '</li>';
