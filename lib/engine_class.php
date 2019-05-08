@@ -1010,11 +1010,11 @@
 			return false;
 		}
 		
-		public function png2jpg($originalFile, $outputFile, $quality){ // ???
+		/* public function png2jpg($originalFile, $outputFile, $quality){ // ???
 			$image = imagecreatefrompng($originalFile);
 			imagejpeg($image, $outputFile, $quality);
 			imagedestroy($image);
-		}
+		} */
 		
 		public static function redirect($link, $msg = ''){ // Редирект на указанный URL
 			$_SESSION['msg'] = $msg;
