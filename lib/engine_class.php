@@ -344,6 +344,11 @@
 			if(!$this->isBlockInstalled($index)) return false;
 			$this->sql->delete('blocks', ['index' => $index]);
 			return !$this->isBlockInstalled($index);
+		public function updateBlockFromFile($index, &$err = 0){
+			if(!$this->isBlockInstalled($index, $err)) return false;
+			$block = $this->getBlockFromFile($index);
+			$id = $this->sql->select('blocks', ['id'], ['index' => $index])[0]['id'];
+			return $this->updateBlock($id, $block);
 		}
 		
 		//--------------------| Аккаунт |--------------------//
