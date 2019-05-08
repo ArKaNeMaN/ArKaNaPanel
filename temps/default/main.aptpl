@@ -154,13 +154,4 @@
 			
 		</div>
 	</body>
-	<script>
-		
-		$(document).ready(() => {
-			//$('link').attr('media', 'all');
-			$('.lc-switch').lc_switch('Вкл', 'Выкл');
-			$('.styler').styler();
-		});
-		
-	</script>
 </html>
