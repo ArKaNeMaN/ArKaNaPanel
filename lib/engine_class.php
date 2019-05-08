@@ -779,6 +779,21 @@
 		}
 		
 		public function getModule($index){
+			if($index == 'core'){
+				return [
+					'name' => 'Ядро',
+					'index' => 'core',
+					'version' => file_get_contents($this->homePath.'apVer.txt'),
+					'author' => 'ArKaNeMaN',
+					'status' => true,
+					'data' => null,
+					'settingsTpl' => null,
+					'files' => null,
+					'reqs' => null,
+					'settingsPage' => 'admin',
+					'settingsPage' => 'hasSettings',
+				];
+			}
 			$res = $this->sql->select('modules', '*', ['index' => $index])[0];
 			if(!$res) return false;
 			return array_merge($res, [
