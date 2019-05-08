@@ -46,9 +46,9 @@ class DataBase {
 		return $data;
 	}
 	
-	public function select ( $table_name, $fields, $where = "", $order = "", $up = true, $limit = "", $debug = 0 ) {
-		if( $fields != "*" ) {
-			for ($i = 0; $i < count($fields); $i++) {
+	public function select($table_name, $fields, $where = "", $order = "", $up = true, $limit = "", $debug = false){
+		if($fields != "*"){
+			for($i = 0; $i < count($fields); $i++) {
 				if((strpos($fields[$i], "(") === false) && ($fields[$i] != "*")) $fields[$i] = "`".$fields[$i]."`";
 			}
 			$fields = implode(",", $fields);
@@ -97,7 +97,7 @@ class DataBase {
 		return $data;
 	}
 	
-	public function insert ( $table_name, $new_values, $debug = 0 ){
+	public function insert($table_name, $new_values, $debug = false){
 		$table_name = $this->prefix.$table_name;
 		$query = "INSERT INTO {$table_name} (";
 		foreach ($new_values as $field => $value) 
@@ -112,7 +112,7 @@ class DataBase {
 		return $this->query( $query, TRUE );
 	}
 	
-	public function update ($table_name, $new_values, $where, $debug = false) {
+	public function update($table_name, $new_values, $where, $debug = false) {
 		if( !isset( $table_name ) ||  !is_array( $new_values ) ||  !is_array( $where )) {
 			die("Заполните все данные");
 			return false;
@@ -146,7 +146,7 @@ class DataBase {
 		else return false;
 	}
 	#########################################################
-	public function search ($table_name, $words, $fields, $order = 'id') {
+	public function search ($table_name, $words, $fields, $order = '', $up = true, $limit = '', $debug = false) {
 		$words = mb_strtolower($words);
 		$words = trim($words);
 		$words = quotemeta($words);
@@ -161,7 +161,7 @@ class DataBase {
 				if (($i+1) != count($fields)) $where .= "OR";
 			}
 		}
-		$results = $this->select($table_name, array("*"), $where, $order);
+		$results = $this->select($table_name, array("*"), $where, $order, $up, $limit, $debug);
 		if (!$results) return false;
 		$k = 0;
 		$data = array();
