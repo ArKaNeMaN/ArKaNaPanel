@@ -967,6 +967,12 @@
 			return $this->sql->select('logs', ['COUNT(*)'], $where)[0]['COUNT(*)'];
 		}
 		
+		public function getLogTypes(){
+			$res = $this->sql->select('logs', ['type'], '`id`>0 GROUP BY `type`', '`type`');
+			for($i = 0; $i < count($res) ;$i++) $res[$i] = $res[$i]['type'];
+			return $res;
+		}
+		
 		//--------------------| Для моддинга |--------------------//
 		
 		private $fwds = [];
