@@ -3,10 +3,15 @@
 	$this->title = 'Список пользователей';
 ?>
 
+<script>window.page = <?php echo isset($_GET['p']) ? $_GET['p'] : 1;?>;</script>
+<script>window.userGroups = <?php echo json_encode($this->getUserGroups());?>;</script>
+<script src="<?php echo PANEL_HOME;?>public/js/adminUsers.js"></script>
 <div id="usersModal"></div>
 
 <h2>Список пользователей</h2>
-
+<input type="text" class="styler" id="searchInput"></input>
+<button class="styler" onclick="searchUsers($('#searchInput').val()); return false;">Поиск</button>
+<button class="styler" onclick="resetSearch(); return false;">Сброс</button>
 <table>
 	<thead>
 		<th>ID</th>
@@ -16,3 +21,10 @@
 	</thead>
 	<tbody id="usersList"></tbody>
 </table>
+
+<div id="usersPagination" align=center></div>
+
+<style>
+	tr.clickable{cursor: pointer;}
+	tr.clickable:hover{background-color: rgba(50, 50, 50, .5);}
+</style>
