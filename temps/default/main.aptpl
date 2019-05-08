@@ -43,13 +43,13 @@
 		<!--Шрифты-->
 		
 		<!--Метрики-->
-			<?php if($this->settings['core']['yaMetrika']):?>
+			<?php if(isset($this->settings['core']['yaMetrika']) && $this->settings['core']['yaMetrika']):?>
 			<!-- Yandex.Metrika-->
 				<script type="text/javascript" async>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)}; m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)}) (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym"); ym(<?php echo (int) $this->settings['core']['yaMetrika'];?>, "init", {id: <?php echo (int) $this->settings['core']['yaMetrika'];?>,clickmap:true,trackLinks:true,accurateTrackBounce:true,trackHash:true});</script>
 				<noscript><div><img src="https://mc.yandex.ru/watch/<?php echo (int) $this->settings['core']['yaMetrika'];?>" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 			<!-- /Yandex.Metrika-->
 			<?php endif;?>
-			<?php if($this->settings['core']['googleAnalytics']):?>
+			<?php if(isset($this->settings['core']['googleAnalytics']) && $this->settings['core']['googleAnalytics']):?>
 			<!-- Google Analytics -->
 				<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo $this->settings['core']['googleAnalytics'];?>"></script>
 				<script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', '<?php echo $this->settings['core']['googleAnalytics'];?>');</script>
