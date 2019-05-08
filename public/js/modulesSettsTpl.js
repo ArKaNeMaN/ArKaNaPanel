@@ -1,42 +1,36 @@
-var isRequestProc = false;
 function saveTplSettings(){
-	if(!isRequestProc){
-		isRequestProc = true;
-		$('#tplSettsCont').waitMe({
-			effect: 'stretch',
-			bg: 'rgba(30, 30, 30, .5)',
-			color: 'rgba(100, 100, 100, .8)'
-		});
-		var sets = window.tplSets;
-		var data = {};
-		for(var i = 0; i < sets.length; i++) data[sets[i].id] = sets[i].type == 'checkbox' ? Number($('#adminTpl'+sets[i].id).is(':checked')) : $('#adminTpl'+sets[i].id).val();
-		$.ajax({
-			url: window.panelHome+'request/modulesTplSets.php?action=save',
-			dataType: 'json',
-			type: 'POST',
-			data: {
-				sets: data,
-				module: window.tplModule
-			},
-			success: function(res){
-				isRequestProc = false;
-				$('#tplSettsCont').waitMe('hide');
-				if(res instanceof Object){
-					if(res.status) iziToast.success({title: res.msg});
-					else iziToast.error({title: res.msg});
-				}
-				else{
-					console.log(res);
-					iziToast.error({title: 'Возникла непредвиденная ошибка'});
-				}
-			},
-			timeout: 5000,
-			error: function(jqXHR, status, errorThrown){
-				isRequestProc = false;
-				iziToast.error({title: 'Ошибка сервера'});
-				$('#tplSettsCont').waitMe('hide');
-				console.log(jqXHR);
-			}
-		});
-	}
+	var sets = window.tplSets;
+	var data = new FormData();
+	for(var i = 0; i < sets.length; i++)
+		if(sets[i].type == 'checkbox') data.append(sets[i].id, Number($('#adminTpl'+sets[i].id).is(':checked')));
+		else if(sets[i].type == 'file'){
+			var settIndex = sets[i].id;
+			$.each($('#adminTpl'+sets[i].id)[0].files, (i, file) => {data.append(settIndex, file);});
+		}
+		else data.append(sets[i].id, $('#adminTpl'+sets[i].id).val());
+		data.append('module', window.tplModule);
+	var req = $.ap.sendRequest(
+		'modulesTplSets', 'save',
+		data,
+		(res) => {
+			$('#tplSettsCont').waitMe('hide');
+			if(res instanceof Object)
+				if(res.status) iziToast.success({title: res.msg});
+				else iziToast.error({title: res.msg});
+			else iziToast.error({title: 'Ошибка сохранения настроек'});
+		},
+		() => {$('#tplSettsCont').waitMe('hide');},
+		true,
+		{
+			cache: false,
+			contentType: false,
+			processData: false,
+			timeout: 30*1000,
+		}
+	);
+	if(req) $('#tplSettsCont').waitMe({
+		effect: 'stretch',
+		bg: 'rgba(30, 30, 30, .5)',
+		color: 'rgba(100, 100, 100, .8)'
+	});
 }

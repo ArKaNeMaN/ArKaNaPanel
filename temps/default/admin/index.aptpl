@@ -30,7 +30,19 @@
 				<tr>
 					<td><?php echo $tpl[$i]['items'][$k]['name'];?></td>
 					<td>
-						<?php if($tpl[$i]['items'][$k]['type'] != 'custom'):?>
+						<?php if($tpl[$i]['items'][$k]['type'] == 'custom'):?>
+							<?php
+								if(!isset($tpl[$i]['items'][$k]['customFile'])) echo 'Путь до файла кастомной настройки не указан';
+								else if(file_exists($tpl[$i]['items'][$k]['customFile'])) require $this->homePath.$tpl[$i]['items'][$k]['customFile'];
+								else echo 'Файл кастомной настройки не найден';
+							?>
+						<?php elseif($tpl[$i]['items'][$k]['type'] == 'file'):?>
+							<input 
+								type="file" 
+								class="styler w100" 
+								id="adminTpl<?php echo $tpl[$i]['items'][$k]['id'];?>" 
+							/>
+						<?php else:?>
 							<input 
 								type="<?php echo $tpl[$i]['items'][$k]['type'];?>" 
 								class="w100 <?php echo $tpl[$i]['items'][$k]['type'] == 'checkbox' ? 'lc-switch' : 'styler';?>" 
@@ -46,12 +58,6 @@
 								<?php endif;?>
 								id="adminTpl<?php echo $tpl[$i]['items'][$k]['id'];?>" 
 							/>
-						<?php else:?>
-							<?php
-								if(!isset($tpl[$i]['items'][$k]['customFile'])) echo 'Путь до файла кастомной настройки не указан';
-								else if(file_exists($tpl[$i]['items'][$k]['customFile'])) require $this->homePath.$tpl[$i]['items'][$k]['customFile'];
-								else echo 'Файл кастомной настройки не найден';
-							?>
 						<?php endif;?>
 					</td>
 				</tr>
