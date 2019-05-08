@@ -295,55 +295,6 @@
 			] : $result;
 		}
 		
-		/*
-			Типы блока:
-				custom	Содержимое блока хранится в БД.
-						Указывается в параметре $content или так же в файле, но в любом случае записывается в БД и берётся от туда.
-						Можно, но не рекомендуется использовать PHP код.
-				
-				file	Контент блока хранится в файле. Параметр $content игнорируется.
-		*/
-		
-		public function installBlock($index, $type = 'file', $content = '', $name = 'Unnamed', $module = 'custom', $rightCol = true, $homePage = false){
-			$id = $this->sql->insert('blocks', [
-				'index' => $index,
-				'name' => $name,
-				'module' => $module,
-				'content' => $content,
-				'type' => $type,
-				'rightCol' => (int) $rightCol,
-				'homePage' => (int) $homePage,
-			]);
-			if(!$id) return false;
-			return $id;
-		}
-		
-		public function updateBlock($index, $data){
-			if(!$this->isBlockInstalled($index)) return $more ? ['status' => false, 'msg' => 'Ошибка! Указанный блок не найден'] : false;
-			//$block = $this->getBlock($index);
-			
-			$update = [];
-			$blockInfoItems = ['name', 'rightCol', 'homePage', 'data', 'content', 'dataList'];
-			for($i = 0; $i < count($blockInfoItems); $i++){
-				if(isset($data[$blockInfoItems[$i]])) $update[$blockInfoItems[$i]] = $data[$blockInfoItems[$i]];
-			}
-			
-			return $this->sql->update('blocks', $update, ['index' => $index]);
-		}
-		
-		public function updateBlockData($index, $data){
-			if(!$this->isBlockInstalled($index)) return false;
-			$block = $this->getBlock($index);
-			
-			$newData = array_merge_recursive($block['data'], $data);
-			
-			return $this->updateBlock($index, ['data' => json_encode($newData)]);
-		}
-		
-		public function deleteBlock($index){
-			if(!$this->isBlockInstalled($index)) return false;
-			$this->sql->delete('blocks', ['index' => $index]);
-			return !$this->isBlockInstalled($index);
 		public function updateBlockFromFile($index, &$err = 0){
 			if(!$this->isBlockInstalled($index, $err)) return false;
 			$block = $this->getBlockFromFile($index);
