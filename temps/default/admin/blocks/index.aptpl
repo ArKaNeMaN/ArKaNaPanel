@@ -3,41 +3,27 @@
 <h2 align=center>Менеджер блоков</h2>
 
 <script src="<?php echo PANEL_HOME;?>public/js/adminBlocks.js" defer></script>
+<div id="blocksModal"></div>
 
 <h3>
-	<i class="fa fa-list"></i> Блоки в правой колонке
-	<button class="styler" onclick="reloadBlocksList('rightCol'); return false;"><i class="fa fa-sync-alt"></i></button>
+	<i class="fa fa-list"></i>
+	<select id="blocksPlaces" class="styler" onchange="changePlaceList(this.value);"><option>Выберите список блоков</option></select>
+	<button class="styler" onclick="reloadBlocksList(); return false;"><i class="fa fa-sync-alt"></i></button>
 </h3>
 <table>
 	<thead>
 		<th>Позиция</th>
 		<th>Название</th>
-		<th>Модуль</th>
-		<th>ID</th>
 		<th>Действия</th>
 	</thead>
-	<tbody id="blocksList-rightCol"></tbody>
-</table>
-
-<h3 style="margin-top: 30px;">
-	<i class="fa fa-home"></i> Блоки на главной странице
-	<button class="styler" onclick="reloadBlocksList('homePage'); return false;"><i class="fa fa-sync-alt"></i></button>
-</h3>
-<table>
-	<thead>
-		<th>Позиция</th>
-		<th>Название</th>
-		<th>Модуль</th>
-		<th>ID</th>
-		<th>Действия</th>
-	</thead>
-	<tbody id="blocksList-homePage"></tbody>
+	<tbody id="placeBlocksList"></tbody>
 </table>
 
 <h3 style="margin-top: 30px;">
 	<i class="fa fa-th-large"></i> Все блоки
 	<button class="styler" onclick="reloadAllBlocksList(); return false;" title="Обновить список блоков"><i class="fa fa-sync-alt"></i></button>
 	<button class="styler" onclick="importAllBlocks(); return false;" title="Импортировать все блоки из файлов"><i class="fa fa-file-upload"></i></button>
+	<button class="styler" onclick="showBlocksFromFiles(); return false;" title="Добавить блок"><i class="fa fa-plus"></i></button>
 </h3>
 <table>
 	<thead>
