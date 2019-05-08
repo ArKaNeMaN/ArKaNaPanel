@@ -1,121 +1,75 @@
 var isRequestProc = false;
 
 function sendSaveMain(){
-	if(!isRequestProc){
-		$('#userSettingsCont').waitMe({
-			effect: 'stretch',
-			bg: 'rgba(30, 30, 30, .5)',
-			color: 'rgba(100, 100, 100, .8)'
-		});
-		$.ajax({
-			url: window.panelHome+'request/userSettings.php?action=saveMain',
-			dataType: 'json',
-			type: 'POST',
-			data: {
-				name: $('#userSettingsNameInp').val(),
-			},
-			success: function(res){
-				$('#userSettingsCont').waitMe('hide');
-				if(res instanceof Object){
-					if(res.status) iziToast.success({title: res.msg});
-					else iziToast.error({title: res.msg});
-				}
-				else{
-					console.log(res);
-					iziToast.error({title: 'Возникла непредвиденная ошибка'});
-				}
-				isRequestProc = false;
-			},
-			timeout: 5000,
-			error: function(jqXHR, status, errorThrown){
-				$('#userSettingsCont').waitMe('hide');
-				alert('Ошибка! '+status+': '+errorThrown);
-				isRequestProc = false;
+	var req = $.ap.sendRequest(
+		'userSettings', 'saveMain',
+		{name: $('#userSettingsNameInp').val()},
+		(res) => {
+			$('#userSettingsCont').waitMe('hide');
+			if(res instanceof Object){
+				if(res.status) iziToast.success({title: res.msg});
+				else iziToast.error({title: res.msg});
 			}
-		});
-		isRequestProc = true;
-	}
+			else{
+				console.log(res);
+				iziToast.error({title: 'Возникла непредвиденная ошибка'});
+			}
+		},
+		() => {$('#userSettingsCont').waitMe('hide');}
+	);
+	if(req) $('#userSettingsCont').waitMe(window.waitMeSettings);
 }
 
 function sendChangePass(){
-	if(!isRequestProc){
-		$('#userSettingsCont').waitMe({
-			effect: 'stretch',
-			bg: 'rgba(30, 30, 30, .5)',
-			color: 'rgba(100, 100, 100, .8)'
-		});
-		$.ajax({
-			url: window.panelHome+'request/userSettings.php?action=changePass',
-			dataType: 'json',
-			type: 'POST',
-			data: {
-				oldPass: $('#userSettingsOldPassInp').val(),
-				newPass: $('#userSettingsNewPassInp').val(),
-				newPassa: $('#userSettingsNewPassaInp').val(),
-			},
-			success: function(res){
-				$('#userSettingsCont').waitMe('hide');
-				if(res instanceof Object){
-					if(res.status) iziToast.success({title: res.msg});
-					else iziToast.error({title: res.msg});
-				}
-				else{
-					console.log(res);
-					iziToast.error({title: 'Возникла непредвиденная ошибка'});
-				}
-				isRequestProc = false;
-			},
-			timeout: 5000,
-			error: function(jqXHR, status, errorThrown){
-				$('#userSettingsCont').waitMe('hide');
-				alert('Ошибка! '+status+': '+errorThrown);
-				isRequestProc = false;
+	var req = $.ap.sendRequest(
+		'userSettings', 'changePass',
+		{
+			oldPass: $('#userSettingsOldPassInp').val(),
+			newPass: $('#userSettingsNewPassInp').val(),
+			newPassa: $('#userSettingsNewPassaInp').val(),
+		},
+		(res) => {
+			$('#userSettingsCont').waitMe('hide');
+			if(res instanceof Object){
+				if(res.status) iziToast.success({title: res.msg});
+				else iziToast.error({title: res.msg});
 			}
-		});
-		isRequestProc = true;
-	}
+			else{
+				console.log(res);
+				iziToast.error({title: 'Что-то пошло не так :('});
+			}
+		},
+		() => {$('#userSettingsCont').waitMe('hide');}
+	);
+	if(req) $('#userSettingsCont').waitMe(window.waitMeSettings);
 }
 
 function sendAvatarForm(){
-	if(!isRequestProc){
-		$('#userSettingsCont').waitMe({
-			effect: 'stretch',
-			bg: 'rgba(30, 30, 30, .5)',
-			color: 'rgba(100, 100, 100, .8)'
-		});
-		var file_data = $('#userSettingsAvatarInp').prop('files')[0];
-		var form_data = new FormData();
-		form_data.append('file', file_data);
-		$.ajax({
-			url: window.panelHome+'request/userSettings.php?action=sendAvatarForm',
-			dataType: 'json',
-			type: 'POST',
-			data: form_data,
+	var file_data = $('#userSettingsAvatarInp').prop('files')[0];
+	var form_data = new FormData();
+	form_data.append('file', file_data);
+	var req = $.ap.sendRequest(
+		'userSettings', 'sendAvatarForm', form_data,
+		(res) => {
+			$('#userSettingsCont').waitMe('hide');
+			if(res instanceof Object){
+				if(res.status){
+					$('#userSettingsAvatarPrev').attr('src', window.panelHome+res.data);
+					iziToast.success({title: res.msg});
+				}
+				else iziToast.error({title: res.msg});
+			}
+			else{
+				console.log(res);
+				iziToast.error({title: 'Что-то пошло не так :('});
+			}
+		},
+		() => {$('#userSettingsCont').waitMe('hide');}, true,
+		{
 			cache: false,
 			contentType: false,
 			processData: false,
-			success: function(res){
-				$('#userSettingsCont').waitMe('hide');
-				if(res instanceof Object){
-					if(res.status){
-						$('#userSettingsAvatarPrev').attr('src', window.panelHome+res.data);
-						iziToast.success({title: res.msg});
-					}
-					else iziToast.error({title: res.msg});
-				}
-				else{
-					console.log(res);
-					iziToast.error({title: 'Возникла непредвиденная ошибка'});
-				}
-				isRequestProc = false;
-			},
-			timeout: 5000,
-			error: function(jqXHR, status, errorThrown){
-				$('#userSettingsCont').waitMe('hide');
-				alert('Ошибка! '+status+': '+errorThrown);
-				isRequestProc = false;
-			}
-		});
-		isRequestProc = true;
-	}
+		}
+	);
+	if(req) $('#userSettingsCont').waitMe(window.waitMeSettings);
 }
