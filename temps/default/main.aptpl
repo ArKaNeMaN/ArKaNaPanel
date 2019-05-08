@@ -65,7 +65,9 @@
 			<div class="header">
 				<div class="panelHead">
 					<div class="logo">
-						<a href="<?php echo PANEL_HOME?>"><img data-src="<?php echo PANEL_HOME?>public/img/logo.png" /></a>
+						<a href="<?php echo PANEL_HOME?>">
+							<img data-src="<?php echo PANEL_HOME?><?php echo (isset($this->settings['core']['logo']) && $this->settings['core']['logo']) ? $this->settings['core']['logo'] : 'public/img/logo.png';?>" />
+						</a>
 					</div>
 					<?php if(!empty($this->userid)):?>
 						<div class="userBlock">
