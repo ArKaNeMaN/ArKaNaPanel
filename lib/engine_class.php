@@ -577,6 +577,8 @@
 				'active' => (int) $data['active']
 			];
 			$id = $this->sql->insert('servers', $sendData);
+			$sendData['id'] = $id;
+			$this->addLog('core', 'addServer', 'Добавлен сервер '.$sendData['name'].'['.$sendData['ip'].':'.$sendData['port'].'].', $sendData);
 			return $more ? ['status' => true, 'msg' => 'Успех! Сервер добавлен', 'data' => array_merge($sendData, ['id' => $id, 'gameName' => $this->gamesList[$sendData['game']]['name'], 'fullAddress' => $sendData['ip'].':'.$sendData['port']])] : false;
 		}
 		
