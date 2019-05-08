@@ -951,10 +951,14 @@
 			$total = $this->getLogsCount($module, $type);
 			$totalPages = round($total/$items, 0, PHP_ROUND_HALF_UP);
 			$page = max(min($totalPages, $page), 1);
-			$res = $this->sql->select('logs', '*', $where, 'time', false, ($page-1)*$items.', '.$items);
+			$res = $this->sql->select('logs', '*', $where, '`time`', false, ($page-1)*$items.', '.$items);
 			if(!$res){
 				$err = 'Не найдено ни одного лога';
 				return false;
+			}
+			for($i = 0; $i < count($res) ;$i++){
+				$res[$i]['data'] = json_decode($res[$i]['data'], true);
+				$res[$i]['timeF'] = $this->timeFormat($res[$i]['time'], true);
 			}
 			return $res;
 		}
