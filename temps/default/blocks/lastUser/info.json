@@ -1,6 +1,6 @@
 {
 	"name": "Last User",
 	"module": "core",
-	"allowRightCol": true,
-	"allowHomePage": false
+	"type": "file",
+	"places": ["rightCol"]
 }
