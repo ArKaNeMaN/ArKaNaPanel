@@ -3,7 +3,13 @@
 	$.ap = {
 		isRequestProc: false,
 		
-		addGetParam: (key, value) => { //https://exceptionshub.com/adding-a-parameter-to-the-url-with-javascript.html
+		getGetParam: (key) => {
+			var val = new RegExp(key + '(?:=(.*?))?(?:[&#]|$)').exec(window.location.search.slice(1));
+			return val === null ? null : (
+				typeof val[1] === 'string' ? decodeURIComponent(val[1].replace(/\+/g, ' ')) : ''
+			);
+		},
+		addGetParam: (key, value, noReload = false) => { //https://exceptionshub.com/adding-a-parameter-to-the-url-with-javascript.html
 			key = encodeURI(key); value = encodeURI(value);
 			var kvp = document.location.search.substr(1).split('&');
 			var i=kvp.length; var x; while(i--){
@@ -15,7 +21,23 @@
 				}
 			}
 			if(i<0) {kvp[kvp.length] = [key,value].join('=');}
-			document.location.search = kvp.join('&');
+			var newUrl = location.protocol+'//'+location.host+location.pathname+'?'+kvp.join('&');
+			if(!noReload) document.location = newUrl;
+			else window.history.pushState({path: newUrl}, '', newUrl);
+		},
+		rmGetParam: (parameter, noReload = false) => {
+			var url = location.href;
+			var urlparts = url.split('?');   
+			if(urlparts.length>=2){
+				var prefix = encodeURIComponent(parameter)+'=';
+				var pars = urlparts[1].split(/[&;]/g);
+				for(var i = pars.length; i-- > 0;)
+					if(pars[i].lastIndexOf(prefix, 0) !== -1) pars.splice(i, 1);
+				if(pars.length > 0) url = urlparts[0]+'?'+pars.join('&');
+				else url = urlparts[0];
+			}
+			if(!noReload) document.location = url;
+			else window.history.pushState({path: url}, '', url);
 		},
 		redirect: (url, params = null) => {
 			url = url.replace(window.panelHome, '');
