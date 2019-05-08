@@ -138,13 +138,8 @@
 				</div>
 				<div class="rightCol">
 					<?php
-						$rightColBlocks = json_decode($this->settings['core']['blocks']['rightCol'], true);
-						function rightColBlocks_sortFunc($a, $b){return ($a['pos'] > $b['pos']);}
-						uasort($rightColBlocks, 'rightColBlocks_sortFunc');
-						foreach($rightColBlocks as $v){
-							$blockInfo = $this->getBlock($v['block']);
-							if($blockInfo['rightCol']) $this->incBlock_($v['block']);
-						}
+						$rightColBlocks = $this->getBlocksList('rightCol');
+						for($i = 0; $i < count($rightColBlocks); $i++) $this->incBlock($rightColBlocks[$i]['block']);
 					?>
 				</div>
 			</div>
