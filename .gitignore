@@ -26,3 +26,4 @@ lib/SourceQuery/*
 temps/default/timeStats/*
 temps/default/banlist/*
 temps/default/admin/modules/old_index.aptpl
+public/plugins/lsxEmojiPicker/*
