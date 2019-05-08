@@ -116,92 +116,12 @@
 		
 		//--------------------| Манагер блоков |--------------------//
 		
-		public function incBlock($name){ // Добавление блока на страницу
-			$fullName = $this->getTplThemePath('temps', '/blocks/'.$name.'/block.aptpl');
-			if(file_exists($fullName)) include($fullName);
-		}
-		
-		public function getAdminBlocks(){
-			$path = $this->homePath.'temps/default/blocks';
-			if(file_exists($path) && is_dir($path)){
-				$result = scandir($path);
-				$files = array_diff($result, array('.', '..'));
-				if(count($files) > 0){
-					foreach($files as $file){
-						if(is_dir("$path/$file")){
-							$blocks[] = $this->getBlockInfo($file);
-						}
-					}
-					return $blocks;
-				}
-			}
-			else return false;
-		}
-		
-		public function getBlocksList($list){
-			if(!isset($this->settings['core']['blocks'][$list])) return false;
-			$blocks = json_decode($this->settings['core']['blocks'][$list], true);
-			foreach($blocks as $k => $v){
-				$blocks_[] = array_merge($v, [
-					'id' => $k,
-					'info' => $this->getBlockInfo($v['block']),
-				]);
-			}
-			return $blocks_;
-		}
-		
-		public function getBlockInfo($block){
-			$infoFile = $this->homePath.'temps/default/blocks/'.$block.'/info.json';
-			if(!file_exists($infoFile)) return false;
-			$info = json_decode(file_get_contents($infoFile), true);
-			$info['id'] = $block;
-			return $info;
-		}
-		
-		public function addBlock($block, $list, $pos){
-			if(!$this->isBlockExists($block)) return false;
-			$blocks = json_decode($this->settings['core']['blocks'][$list], true);
-			$blocks[] = ['block' => $block, 'pos' => $pos];
-			/* function sortFunc($a, $b){return ($a['pos'] > $b['pos']);}
-			uasort($this->settings['core']['blocks'][$list], 'sortFunc'); */
-			$this->setModuleSettings('core', ['blocks' => [$list => json_encode($blocks)]]);
-			return true;
-		}
-		
-		public function removeBlockByNum($blockId, $list){
-			$blocks = json_decode($this->settings['core']['blocks'][$list], true);
-			if(!isset($blocks[$blockId])) return false;
-			unset($blocks[$blockId]);
-			/* function sortFunc($a, $b){return ($a['pos'] > $b['pos']);}
-			uasort($blocks, 'sortFunc'); */
-			$this->setModuleSettings('core', ['blocks' => [$list => json_encode($blocks)]]);
-			return true;
-		}
-		
-		public function isBlockExists($block){
-			return (bool) file_exists($this->homePath.'temps/default/blocks/'.$block.'/info.json');
-		}
-		
-		
-		public function getBlocksList_($list){
-			if(!isset($this->settings['core']['blocks'][$list])) return false;
-			$blocks = json_decode($this->settings['core']['blocks'][$list], true);
-			foreach($blocks as $k => $v){
-				$blocks_[] = array_merge($v, [
-					'id' => $k,
-					'info' => $this->getBlock($v['block']),
-				]);
-			}
-			return $blocks_;
-		}
-		
-		public function incBlock_($index){
-			if(!$this->isBlockInstalled($index)) return false;
-			$block = $this->getBlock($index);
-			
+		public function incBlock($id){
+			if(!$this->isBlockExists($id, $err)) return false;
+			$block = $this->getBlock($id);
 			switch($block['type']){
 				case 'file': {
-					$contFile = $this->homePath.'temps/default/blocks/'.$block['index'].'/block.aptpl';
+					$contFile = $this->getTplThemePath('temps', '/blocks/'.$block['index'].'/block.aptpl');
 					if(!file_exists($contFile) || !is_file($contFile)) return false;
 					include $contFile;
 				}
@@ -219,19 +139,114 @@
 			return true;
 		}
 		
+		/*Списки*/
+		
+		public function getBlocksList($list){
+			$res = $this->sql->select('blocksShow', '*', ['place' => $list], 'pos', true);
+			if(!$res){
+				$err = 'Блоков для указанного места не найдено';
+				return false;
+			}
+			for($i = 0; $i < count($res); $i++){
+				$res[$i]['data'] = json_decode($res[$i]['data'], true);
+				$res[$i]['info'] = $this->getBlock($res[$i]['block']);
+			}
+			return $res;
+		}
+		
+		public function addBlock($id, $place, &$err = 0){
+			if(!$this->isBlockExists($id, $err)) return false;
+			$block = $this->getBlock($id);
+			if(!in_array($place, $block['places'])){
+				$err = 'Данный блок не может быть размещён тут';
+				return false;
+			}
+			return $this->sql->insert('blocksShow', ['block' => $id, 'place' => $place]);
+		}
+		
+		public function rmBlockFromList($id){
+			$this->sql->delete('blocksShow', ['id' => $id]);
+			return true;
+		}
+		
+		public function getBlocksPlaces(){
+			$res = $this->sql->select('blocksShow', ['place'], '`id`>0 GROUP BY `place`');
+			for($i = 0; $i < count($res); $i++) $res[$i] = $res[$i]['place'];
+			return $res;
+		}
+		
+		/*Блоки*/
+		
 		public function getBlocks(){
 			$res = $this->sql->select('blocks', '*');
+			for($i = 0; $i < count($res); $i++){
+				$res[$i]['dataList'] = json_decode($res[$i]['dataList'], true);
+				$res[$i]['places'] = json_decode($res[$i]['places'], true);
+			}
 			return $res;
 		}
 		
-		public function getBlock($index){
-			if(!$this->isBlockInstalled($index)) return false;
-			$res = $this->sql->select('blocks', '*', ['index' => $index])[0];
+		public function getBlock($id, &$err = 0){
+			if(!$this->isBlockExists($id, $err)) return false;
+			$res = $this->sql->select('blocks', '*', ['id' => $id])[0];
+			$res['places'] = json_decode($res['places'], true);
+			$res['dataList'] = json_decode($res['dataList'], true);
 			return $res;
 		}
 		
-		public function isBlockInstalled($index){
-			return (bool) $this->sql->select('blocks', ['COUNT(*)'], ['index' => $index])[0]['COUNT(*)'];
+		public function isBlockExists($id, &$err = 0){
+			$res = (bool) $this->sql->select('blocks', ['COUNT(*)'], ['id' => $id])[0]['COUNT(*)'];
+			if(!$res) $err = 'Блок не найден'; 
+			return $res;
+		}
+		
+		public function editBlockData($id, $data){
+			if(!$this->isBlockExists($id)) return false;
+			$block = $this->getBlock($id);
+			
+			$newData = array_merge_recursive($block['data'], $data);
+			
+			return $this->updateBlock($id, ['data' => json_encode($newData)]);
+		}
+		
+		public function deleteBlock($id){
+			if(!$this->isBlockExists($id)) return false;
+			$this->sql->delete('blocks', ['id' => $id]);
+			$this->sql->delete('blocksShow', ['block' => $id]);
+			return !$this->isBlockExists($id);
+		}
+		
+		/*Файлы*/
+		
+		public function isBlockInstalled($index, &$err = 0){
+			$res = (bool) $this->sql->select('blocks', ['COUNT(*)'], ['index' => $index])[0]['COUNT(*)'];
+			if(!$res) $err = 'Блок не найден';
+			else $err = 'Данный блок уже установлен';
+			return $res;
+		}
+		
+		public function getBlockFromFile($index){
+			$infoFile = $this->homePath.'temps/default/blocks/'.$index.'/info.json';
+			if(!file_exists($infoFile)) return false;
+			$info = json_decode(file_get_contents($infoFile), true);
+			$info['index'] = $index;
+			return $info;
+		}
+		
+		public function getBlocksFromFiles($forInstall = false){
+			$path = $this->homePath.'temps/default/blocks';
+			if(file_exists($path) && is_dir($path)){
+				if(count($files = array_diff(scandir($path), array('.', '..'))) > 0){
+					foreach($files as $file)
+						if(is_dir("$path/$file") && (!$this->isBlockInstalled($file) || !$forInstall)){
+							$block = $this->getBlockFromFile($file);
+							if($block) $res[] = $block; 
+						}
+					return $res;
+				}
+				else return false;
+			}
+			return false;
 		}
 		
 		public function importAllBlocks($output = false){
