@@ -257,27 +257,61 @@
 			return;
 		}
 		
+		public function installBlock($index, $type = 'file', $name = 'Unnamed', $module = 'custom', $places = [], $dataList = [], $content = ''){
+			$id = $this->sql->insert('blocks', [
+				'index' => $index,
+				'name' => $name,
+				'module' => $module,
+				'content' => $content,
+				'type' => $type,
+				'places' => json_encode($places),
+				'dataList' => json_encode($dataList),
+			]);
+			if(!$id) return false;
+			return $id;
+		}
+		
+		public function updateBlock($id, $data, &$err = 0){
+			if(!$this->isBlockExists($id, $err)) return false;
+			$block = $this->getBlock($id);
+			
+			$update = [];
+			if(isset($data['name'])) $update['name'] = $data['name'];
+			if(isset($data['type'])) $update['type'] = $data['type'];
+			if(isset($data['content'])) $update['content'] = $data['content'];
+			if(isset($data['dataList'])) $update['dataList'] = json_encode($data['dataList']);
+			if(isset($data['places'])) $update['places'] = json_encode($data['places']);
+			if($update == []){
+				$err = 'Не указаны новые данные';
+				return false;
+			}
+			
+			return $this->sql->update('blocks', $update, ['id' => $id]);
+		}
+		
 		public function installBlockFromFile($file, $_data = [], $more = false){
 			if(!file_exists($file) || !is_file($file)) return $more ? ['status' => false, 'msg' => 'Ошибка! Файл не найден'] : false;
 			$data_ = json_decode(file_get_contents($file), true);
 			if(!$data_) return $more ? ['status' => false, 'msg' => 'Ошибка! Ошибка синтаксиса файла'] : false;
 			
-			$data_ = array_merge_recursive($data_, $_data);
-			$blockInfoItems = ['index', 'name', 'module', 'rightCol', 'homePage', 'type', 'content', 'dataList'];
+			$data_ = array_merge($data_, $_data);
+			$blockInfoItems = ['index', 'name', 'module', 'type', 'content', 'dataList', 'places'];
 			for($i = 0; $i < count($blockInfoItems); $i++){
 				if(isset($data_[$blockInfoItems[$i]])) $data[$blockInfoItems[$i]] = $data_[$blockInfoItems[$i]];
 				else $data[$blockInfoItems[$i]] = null;
 			}
 			
 			// Для совместимости
-			if(isset($data_['allowRightCol'])) $data['rightCol'] = $data_['allowRightCol'];
-			if(isset($data_['allowHomePage'])) $data['homePage'] = $data_['allowHomePage'];
+			if(isset($data_['allowRightCol']) && $data_['allowRightCol']) $data['places'][] = "rightCol";
+			elseif(isset($data_['rightCol']) && $data_['rightCol']) $data['places'][] = "rightCol";
+			if(isset($data_['allowHomePage']) && $data_['allowHomePage']) $data['places'][] = "homePage";
+			elseif(isset($data_['homePage']) && $data_['homePage']) $data['places'][] = "homePage";
 			
 			$contFile = $this->homePath.'temps/default/blocks/'.$data['index'].'/block.aptpl';
-			$data['content'] = '';
 			
 			switch($data['type']){
 				case 'file': {
+					$data['content'] = '';
 					if(!file_exists($contFile) || !is_file($contFile)) return $more ? ['status' => false, 'msg' => 'Ошибка! Файл с содержимым блока не найден'] : false;
 					break;
 				}
@@ -289,7 +323,7 @@
 				}
 			}
 			
-			$result = $this->installBlock($data['index'], $data['type'], $data['content'], $data['name'], $data['module'], $data['rightCol'], $data['homePage']);
+			$result = $this->installBlock($data['index'], $data['type'], $data['name'], $data['module'], $data['places'], $data['dataList'], $data['content']);
 			return $more ? [
 				'status' => $result, 'msg' => $result ? 'Успех! Блок установлен' : 'Ошибка! Ошибка установки блока'
 			] : $result;
