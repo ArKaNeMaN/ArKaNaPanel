@@ -1,0 +1,76 @@
+<?php
+	$this->checkAccess(1);
+	
+	$this->title = 'Логи';
+	
+	$itemsCount = 20;
+	$module = isset($_GET['module']) ? $_GET['module'] : null;
+	$type = isset($_GET['type']) ? $_GET['type'] : null;
+	
+	$total = $this->getLogsCount($module, $type);
+	$totalPages = round($total/$itemsCount, 0, PHP_ROUND_HALF_UP);
+	if(isset($_GET['p'])) $page = max(min($_GET['p'], $totalPages), 1);
+	else $page = 1;
+	
+?>
+
+<script src="<?php echo PANEL_HOME?>public/js/logs.js"></script>
+<div id="logsModal"></div>
+<script>window.logs = [];</script>
+
+<h2>Логи</h2>
+
+<?php if($logTypes = $this->getLogTypes()):?>
+	<select class="styler" onchange="$.ap.addGetParam('type', this.value);">
+		<option value="">Все</option>
+		<?php for($i = 0; $i < count($logTypes); $i++):?>
+			<option value="<?php echo $logTypes[$i];?>" <?php echo ($type == $logTypes[$i]) ? 'selected' : ''?>><?php echo $logTypes[$i];?></option>
+		<?php endfor;?>
+	</select>
+<?php endif;?>
+
+<?php if($modules = $this->getModules()):?>
+	<select class="styler" onchange="$.ap.addGetParam('module', this.value);">
+		<option value="">Все</option>
+		<option value="core">Ядро</option>
+		<?php for($i = 0; $i < count($modules); $i++):?>
+			<option value="<?php echo $modules[$i]['index'];?>" <?php echo ($module == $modules[$i]['index']) ? 'selected' : ''?>><?php echo $modules[$i]['name'];?></option>
+		<?php endfor;?>
+	</select>
+<?php endif;?>
+
+<table>
+	<thead>
+		<th>ID</th>
+		<th>Юзер</th>
+		<th>Тип</th>
+		<th>Модуль</th>
+		<th>Текст</th>
+		<th>Дата</th>
+	</thead>
+	<tbody>
+		<?php if($logs = $this->getLogs($page, $itemsCount, $module, $type, $err)):?>
+			<?php for($i = 0; $i < count($logs); $i++):?>
+				<script>window.logs[<?php echo $i?>] = <?php echo json_encode($logs[$i]);?>;</script>
+				<tr onclick="showLogInfo(<?php echo $i?>); return false;" class="clickable">
+					<td><?php echo $logs[$i]['id'];?></td>
+					<td><?php echo $this->getUserInfo($logs[$i]['userid'])['login'];?></td>
+					<td><?php echo $logs[$i]['type'];?></td>
+					<td><?php echo $this->getModule($logs[$i]['module'])['name'];?></td>
+					<td><?php echo $logs[$i]['text'];?></td>
+					<td><?php echo $logs[$i]['timeF'];?></td>
+				</tr>
+			<?php endfor;?>
+		<?php else:?>
+			<tr><td colspan="5"><div align=center><?php echo $err;?></div></td></tr>
+		<?php endif;?>
+	</tbody>
+</table>
+
+<style>
+	tr.clickable{cursor: pointer;}
+	tr.clickable:hover{background-color: rgba(50, 50, 50, .5);}
+</style>
+
+<div align=center id="logsPagination"></div>
+<script>$('#logsPagination').apPagination(<?php echo $page.', '.$totalPages?>);</script>
