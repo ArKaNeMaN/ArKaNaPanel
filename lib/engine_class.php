@@ -102,7 +102,6 @@
 					closedir($dh);
 				}
 			}
-			
 		}
 		
 		public function checkAccess($group, $return = false){ // Проверка доступа пользователя
@@ -726,7 +725,6 @@
 				$this->sql->insert('settings', ['module' => $module, 'data' => json_encode($settings)]);
 				$this->settings[$module] = $settings;
 			}
-			
 			return true;
 		}
 		
