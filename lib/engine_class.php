@@ -477,29 +477,93 @@
 			return $this->getUserInfo($this->sql->select('users', ['id'], '', 'id', false, 1)[0]['id']);
 		}
 		
-		public function editUserInfo($id, $data, $more = false){ // Изменение информации об аккаунте
+		public function isUserExists($id, &$err = 0){
+			$res = (bool) $this->sql->select('users', ['COUNT(*)'], ['id' => $id])[0]['COUNT(*)'];
+			if(!$res) $err = 'Пользователь не найден';
+			return $res;
+		}
+		
+		public function editUserInfo($id, $data, &$err = 0){ // Изменение информации об аккаунте
+			if(!$this->isUserExists($id, $err)) return false;
 			
 			$userInfo = $this->getUserInfo($id);
+			$needUpdateHash = false;
+			$newData = [];
+			
+			if(isset($data['email']) && $data['email'] != $userInfo['email'] && $data['email'] != ''){
+				if(!filter_var($data['email'], FILTER_VALIDATE_EMAIL)){
+					$err = 'Почта введена неверно';
+					return false;
+				}
+				if($this->sql->select('users', ['COUNT(*)'], ['email' => $data['email']])[0]['COUNT(*)']){
+					$err = 'Указанная почта уже занята';
+					return false;
+				}
+				$newData['email'] = $data['email'];
+			}
+			
+			if(isset($data['login']) && $data['login'] != $userInfo['login']){
+				if(strlen($data['login']) < 4){
+					$err = 'Логин должен быть длиннее 3-х символов';
+					return false;
+				}
+				if(!preg_match('#^[aA-zZ0-9\-_]+$#', $data['login'])){
+					$err = 'Логин не должен содержать спец. символы';
+					return false;
+				}
+				if($this->sql->select('users', ['COUNT(*)'], ['login' => $data['login']])[0]['COUNT(*)']){
+					$err = 'Логин '.$data['login'].' занят другим пользователем';
+					return false;
+				}
+				$newData['login'] = $data['login'];
+				$needUpdateHash = true;
+			}
 			
 			if(isset($data['name']) && $userInfo['name'] != $data['name']){
 				$data['name'] = htmlentities($data['name']);
 				$data['name'] = str_replace("&nbsp;", '', $data['name']);
 				$data['name'] = htmlspecialchars($data['name']);
-				if($this->sql->select('users', ['COUNT(*)'], ['name' => $data['name']])[0]['COUNT(*)']) return $more ? ['status' => false, 'msg' => 'Ошибка! Игрок с таким ником уже существует'] : false;
-				$this->sql->update('users', ['name' => $data['name']], ['id' => $id]);
+				if($this->sql->select('users', ['COUNT(*)'], ['name' => $data['name']])[0]['COUNT(*)']){
+					$err = 'Игрок с таким ником уже существует';
+					return false;
+				}
+				$newData['name'] = $data['name'];
 			}
 			
-			if(isset($data['avatar'])){
-				if(!file_exists($this->homePath.$data['avatar'])) return $more ? ['status' => false, 'msg' => 'Ошибка! Файл аватара не найден'] : false;
-				$this->sql->update('users', ['avatar' => $data['avatar']], ['id' => $id]);
+			if(isset($data['pass']) && $data['pass'] != ''){
+				if(strlen($data['pass']) < 4){
+					$err = 'Пароль должен быть длиннее 3-х символов';
+					return false;
+				}
+				$newData['pass'] = md5($data['pass']);
+				$needUpdateHash = true;
 			}
 			
-			if(isset($data['pass'])){
-				$this->sql->update('users', ['pass' => md5($data['pass'])], ['id' => $id]);
+			if(isset($data['avatar']) && $userInfo['avatar'] != $data['avatar']){
+				if(!file_exists($this->homePath.$data['avatar'])){
+					$err = 'Файл аватара не найден';
+					return false;
+				}
+				$newData['avatar'] = $data['avatar'];
 			}
 			
-			$this->updateUserHash($id);
-			return $more ? ['status' => true, 'msg' => 'Успех! Данные о пользователе изменены'] : true;
+			if(isset($data['money'])){
+				$newData['money'] = (int) $data['money'];
+			}
+			
+			if(isset($data['group'])){
+				if(!$this->isUserGroupExists((int) $data['group'], $err)) return false;
+				$newData['group'] = (int) $data['group'];
+			}
+			
+			if($newData == []){
+				$err = 'Данные не введены';
+				return false;
+			}
+			$this->sql->update('users', $newData, ['id' => $id]);
+			
+			if($needUpdateHash) $this->updateUserHash($id);
+			return true;
 		}
 		
 		public function editUserCustomData($id, $module, $data, $more = false){
