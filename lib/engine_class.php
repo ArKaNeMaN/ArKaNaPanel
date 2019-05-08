@@ -453,17 +453,11 @@
 		public function checkAuth(){ // Проверка сессии пользователя
 			if(isset($_COOKIE['userHash']) && !empty($_COOKIE['userHash'])){
 				if(is_array($res = $this->sql->select('users', ['id'], ['userHash' => $_COOKIE['userHash']]))){
-					//$_SESSION['userid'] = $res[0]['id'];
 					$this->userid = $res[0]['id'];
 					$this->userInfo = $this->getUserInfo($this->userid);
 					$this->sql->update('users', ['lastIp' => $this->getIp()], ['id' => $this->userid]);
 				}
 			}
-			/* if(isset($_SESSION['userid'])){
-				$this->userid = $_SESSION['userid'];
-				$this->userInfo = $this->getUserInfo($this->userid);
-				$this->sql->update('users', ['lastIp' => $this->getIp()], ['id' => $this->userid]);
-			} */
 		}
 		
 		public function getUserInfo($userid){ // Получение информации об аккаунте
