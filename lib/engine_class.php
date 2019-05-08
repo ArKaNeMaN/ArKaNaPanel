@@ -583,11 +583,57 @@
 			
 		}
 		
-		public function getUserGroups($more = false){ // Получение массива групп пользователей
-			$ret[0] = ['name' => 'Все', 'id' => 0];
+		public function isUserGroupExists($id, &$err = 0){
+			if(!$this->sql->select('groups', ['COUNT(*)'], ['id' => $id])[0]['COUNT(*)']){
+				$err = 'Указанная группа не найдена';
+				return false;
+			}
+			return true;
+		}
+		
+		public function getUserGroupsCount(){
+			return $this->sql->select('groups', ['COUNT(*)'])[0]['COUNT(*)'];
+		}
+		
+		public function addUserGroup($name, $access){
+			return $this->sql->insert('groups', ['name' => $name, 'accessLevel' => $access]);
+		}
+		
+		public function editUserGroup($id, $name, $access, &$err = 0){
+			if(!$this->isUserGroupExists($id, $err)) return false;
+			return $this->sql->update('groups', ['name' => $name, 'accessLevel' => $access], ['id' => $id]);
+		}
+		
+		public function editUserGroupData($id, $module, $data, &$err = 0){
+			if(!$this->isUserGroupExists($id, $err)) return false;
+			$old = json_decode($this->getUserGroup($id)['data']);
+			$old[$module] = array_merge_recursive($old[$module], $data);
+			return $this->sql->update('groups', ['data' => $data_], ['id' => $id]);
+		}
+		
+		public function delUserGroup($id, &$err = 0){
+			if(!$this->isUserGroupExists($id, $err)) return false;
+			return $this->sql->delete('groups', ['id' => $id]);
+		}
+		
+		public function getUserGroup($id, &$err = 0){
+			$res = $this->sql->select('groups', '*', ['id' => $id])[0];
+			if(!$res){
+				$err = 'Указанная группа не найдена';
+				return false;
+			}
+			$res['data'] = json_decode($res['data'], true);
+			return $res;
+		}
+		
+		public function getUserGroups(&$err = 0){ // Получение массива групп пользователей
 			$res = $this->sql->select('groups', '*');
-			for($i = 0; $i < count($res); $i++) $ret[$i+1] = $res[$i];
-			return $more ? ['status' => true, 'msg' => 'Успех! группы пользователей получены', 'data' => $ret] : $ret;
+			if(!$res){
+				$err = 'Группы пользователей не найдены';
+				return false;
+			}
+			for($i = 0; $i < count($res); $i++) $res[$i]['data'] = json_decode($res[$i]['data'], true);
+			return $res;
 		}
 		
 		//--------------------| Сервера |--------------------//
