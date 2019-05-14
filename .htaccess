@@ -5,8 +5,8 @@ RewriteEngine On
 
 
 
-RewriteCond %{HTTP_HOST} ^www.arkanaworld.ru$ [NC]
-RewriteRule ^(.*)$ http://arkanaworld.ru/$1 [R=301,L]
+RewriteCond %{HTTP_HOST} ^www.ap.arkaneman.ru$ [NC]
+RewriteRule ^(.*)$ http://ap.arkaneman.ru/$1 [R=301,L]
 
 # Сюда дописать название папки в которую установлена панель
 # Пример:
