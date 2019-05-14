@@ -21,7 +21,7 @@
 			UNIQUE KEY `email` (`email`),
 			UNIQUE KEY `userHash` (`userHash`),
 			KEY `id` (`id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
+		) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 	");
 	
 	$sql->query("
@@ -32,7 +32,7 @@
 			PRIMARY KEY (`id`),
 			UNIQUE KEY `module` (`module`),
 			KEY `id` (`id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
+		) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 	");
 	
 	$sql->query("
@@ -48,7 +48,7 @@
 			`parent` int(11) NOT NULL DEFAULT '0',
 			PRIMARY KEY (`id`),
 			KEY `id` (`id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
+		) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 	");
 	
 	$sql->query("
@@ -64,33 +64,43 @@
 			PRIMARY KEY (`id`),
 			UNIQUE KEY `ip` (`ip`,`port`),
 			KEY `id` (`id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
+		) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 	");
 	
 	$sql->query("
 		CREATE TABLE IF NOT EXISTS `".$_POST['prefix']."groups` (
-			`id` int(11) NOT NULL,
+			`id` int(11) NOT NULL AUTO_INCREMENT,
 			`name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
+			`accessLevel` int(11) NOT NULL DEFAULT '100',
+			`data` text COLLATE utf8_unicode_ci NOT NULL,
 			PRIMARY KEY (`id`),
 			KEY `id` (`id`)
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+		) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 	");
 	
 	$sql->query("
 		CREATE TABLE IF NOT EXISTS `".$_POST['prefix']."blocks` (
 			`id` int(11) NOT NULL AUTO_INCREMENT,
 			`index` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
-			`type` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+			`type` varchar(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'file',
 			`name` varchar(128) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Unnamed',
 			`module` varchar(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'core',
-			`content` text COLLATE utf8_unicode_ci NOT NULL,
-			`homePage` tinyint(1) NOT NULL DEFAULT '0',
-			`rightCol` tinyint(1) NOT NULL DEFAULT '1',
-			`data` text COLLATE utf8_unicode_ci NOT NULL,
-			`dataList` text COLLATE utf8_unicode_ci NOT NULL,
+			`content` text COLLATE utf8_unicode_ci NULL,
+			`dataList` text COLLATE utf8_unicode_ci NULL,
+			`places` text COLLATE utf8_unicode_ci NOT NULL,
 			PRIMARY KEY (`id`),
 			UNIQUE KEY `index` (`index`)
 		) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
+	");
+	
+	$sql->query("
+		CREATE TABLE IF NOT EXISTS `".$_POST['prefix']."blocksShow` (
+			`id` int(11) NOT NULL,
+			`block` int(11) NOT NULL,
+			`pos` int(11) NOT NULL DEFAULT 1,
+			`place` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
+			`data` text COLLATE utf8_unicode_ci DEFAULT NULL
+		) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 	");
 	
 	$sql->query("

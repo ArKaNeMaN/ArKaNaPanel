@@ -82,35 +82,38 @@
 				'regTime' => time(),
 			]);
 			
-			// Создание аккаунта админа
-			/* $sql->query("INSERT INTO `".$_POST['prefix']."users` (`login`, `name`, `pass`, `group`, `regIp`, `lastIp`, `regTime`) 
-			VALUES('".$_POST['adminLogin']."', '".$_POST['adminName']."', '".md5($_POST['adminPass'])."', 1, '".getIp()."', '".getIp()."', ".time().")"); */
-			
 			// Добавление дефолтных пунктов меню
 			$sql->query("
 				INSERT INTO `".$_POST['prefix']."menu` (`id`, `pos`, `name`, `link`, `active`, `submenu`, `type`, `group`, `parent`) VALUES
 					(1, 1, 'Главная', '', 1, 0, 0, 0, 0),
-					(2, 2, 'Админка', '', 1, 1, 1, 1, 0),
+					(2, 100, 'Админка', '', 1, 1, 1, 1, 0),
 					(3, 1, 'Настройка панели', 'admin', 1, 0, 1, 1, 2),
 					(4, 2, 'Менеджер модулей', 'admin/modules', 1, 0, 1, 1, 2),
 					(5, 3, 'Менеджер блоков', 'admin/blocks', 1, 0, 1, 1, 2),
 					(6, 4, 'Менеджер серверов', 'admin/servers', 1, 0, 1, 1, 2),
 					(7, 5, 'Пользователи', 'admin/users', 1, 0, 1, 1, 2),
 					(8, 6, 'Меню', 'admin/menu', 1, 0, 1, 1, 2),
-					(9, 7, 'Логи', 'admin/logs', 1, 0, 1, 1, 2)
+					(9, 7, 'Логи', 'admin/logs', 1, 0, 1, 1, 2);
 			");
 			
 			// Добавление дефолтных групп пользователей
 			$sql->query("
-				INSERT INTO `".$_POST['prefix']."groups` (`id`, `name`) VALUES
-					(1, 'Гл.Админ'),
-					(100, 'Пользователь');
+				INSERT INTO `".$_POST['prefix']."groups` (`id`, `name`, `accessLevel`, `data`) VALUES
+					(1, 'Гл.Админ', 1, ''),
+					(2, 'Пользователь', 100, '');
 			");
 			
 			$sql->query("
-				INSERT INTO `".$_POST['prefix']."blocks` (`id`, `index`, `type`, `name`, `module`, `content`, `homePage`, `rightCol`, `dataList`) VALUES
-				(1, 'helloWorld', 'file', 'Hello World', 'core', '', 1, 1, '[]'),
-				(2, 'lastUser', 'file', 'Last User', 'core', '', 0, 1, '[]');
+				INSERT INTO `".$_POST['prefix']."blocks` (`id`, `index`, `type`, `name`, `module`, `content`, `dataList`, `places`) VALUES
+					(1, 'helloWorld', 'file', 'Hello World', 'core', NULL, NULL, '[\"rightCol\",\"homePage\"]'),
+					(2, 'lastUser', 'file', 'Last User', 'core', NULL, NULL, '[\"rightCol\"]');
+			");
+			
+			$sql->query("
+				INSERT INTO `".$_POST['prefix']."blocksShow` (`id`, `block`, `pos`, `place`, `data`) VALUES
+					(1, 1, 1, 'homePage', NULL),
+					(2, 1, 2, 'rightCol', NULL),
+					(3, 2, 1, 'rightCol', NULL);
 			");
 			
 			$defSetts = [
@@ -120,20 +123,6 @@
 				'yaMetrika' => 0,
 				'googleAnalytics' => '',
 				'zipAvatars' => 0,
-				'blocks' => [
-					'homePage' => json_encode([
-						[
-							'block' => 'helloWorld',
-							'pos' => 1
-						],
-					]),
-					'rightCol' => json_encode([
-						[
-							'block' => 'lastUser',
-							'pos' => 1
-						],
-					]),
-				],
 			];
 			
 			$sql_->insert('settings', [
