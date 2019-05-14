@@ -439,6 +439,25 @@
 			return $more ? ['status' => true, 'msg' => 'Успех! Авторизация прошла успешно'] : true;
 		}
 		
+		public function getUserHash($login, $pass, &$err = 0){
+			if($login == ''){
+				$err = 'Логин не введён';
+				return false;
+			}
+			if($pass == ''){
+				$err = 'Пароль не указан';
+				return false;
+			}
+			
+			$res = $this->sql->select('users', ['userHash'], '`login`="'.$login.'" AND `pass`="'.md5($pass).'"')[0]['userHash'];
+			if(!$res){
+				$err = 'Введён неверный логин или пароль';
+				return false;
+			}
+			
+			return $res;
+		}
+		
 		private function updateUserHash($id){ // Пересоздание хеша сессии пользователя
 			$data = $this->getUserInfo($id);
 			$userHash = md5($data['login'].'saltysalt'.$data['pass'].time());
@@ -456,8 +475,10 @@
 		}
 		
 		public function checkAuth(){ // Проверка сессии пользователя
-			if(isset($_COOKIE['userHash']) && !empty($_COOKIE['userHash'])){
-				if(is_array($res = $this->sql->select('users', ['id'], ['userHash' => $_COOKIE['userHash']]))){
+			if((isset($_COOKIE['userHash']) && !empty($_COOKIE['userHash'])) || isset($_GET['userHash'])){
+				if(isset($_GET['userHash'])) $userHash = $_GET['userHash'];
+				else $userHash = $_COOKIE['userHash'];
+				if(is_array($res = $this->sql->select('users', ['id'], ['userHash' => $userHash]))){
 					$this->userid = $res[0]['id'];
 					$this->userInfo = $this->getUserInfo($this->userid);
 					$this->sql->update('users', ['lastIp' => $this->getIp()], ['id' => $this->userid]);
