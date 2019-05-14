@@ -10,8 +10,6 @@
 		$userInfo = $this->getUserInfo($_GET['id']);
 		$this->title = 'Профиль '.$userInfo['name'];
 	}
-	
-	if($userInfo['custom']['locked'] == true && $this->userInfo['group'] != 0) $this->error = 423;
 ?>
 
 <link href="/public/temps/default/css/profile.css" rel="stylesheet"/>
