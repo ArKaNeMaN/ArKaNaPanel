@@ -15,6 +15,11 @@
 			$response = $eng->userLogout();
 			break;
 		}
+		case 'getHash': {
+			$hash = $eng->getUserHash($_POST['login'], $_POST['pass'], $err);
+			if($hash) $eng->ajaxReturnStatus(true, 'Авторизация прошла успешно', $hash);
+			else $eng->ajaxReturnStatus(false, $err);
+		}
 	}
 	
 	$eng->ajaxReturn($response);
