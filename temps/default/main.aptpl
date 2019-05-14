@@ -7,7 +7,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta content="<?php echo $this->desc?>" name="description" />
-		<meta name="yandex-tableau-widget" content="logo=<?php echo PANEL_HOME?>public/img/logo.png, color=#1e1e1e" />
+		<meta name="yandex-tableau-widget" content="logo=<?php echo PANEL_HOME?><?php echo (isset($this->settings['core']['logo']) && $this->settings['core']['logo']) ? $this->settings['core']['logo'] : 'public/img/logo.png';?>, color=#1e1e1e" />
 		<meta name="theme-color" content="#1e1e1e">
 		<meta name="apple-mobile-web-app-status-bar-style" content="#1e1e1e">
 		<meta name="viewport" content="ya-title=#1e1e1e,ya-dock=#1e1e1e">
@@ -24,7 +24,7 @@
 		<script>window.panelHome = '<?php echo PANEL_HOME?>';</script>
 		<script>window.waitMeSettings = {effect:'stretch',bg:'rgba(30, 30, 30, .5)',color:'rgba(100, 100, 100, .8)'};</script>
 		<script src="<?php echo PANEL_HOME?>public/js/main.js"></script>
-		<?php if($this->settings['core']['captchaPubKey'] && $this->settings['core']['captchaSecKey']):?>
+		<?php if(isset($this->settings['core']['captchaPubKey']) && isset($this->settings['core']['captchaSecKey'])):?>
 			<script src='https://www.google.com/recaptcha/api.js' defer></script>
 		<?php endif;?>
 		<script src="<?php echo PANEL_HOME?>public/js/authBlock.js" defer></script>
@@ -73,7 +73,7 @@
 					<?php if(!empty($this->userid)):?>
 						<div class="userBlock">
 							<div class="userName"><?php echo $this->userInfo['name']?></div>
-							<div class="userAvatar" data-bg="/<?php echo PANEL_DIR.$this->userInfo['avatar']?>"></div>
+							<div class="userAvatar" data-bg="<?php echo PANEL_HOME.$this->userInfo['avatar']?>"></div>
 							<ul class="userMenu">
 								<li><a href="<?php echo PANEL_HOME?>profile"><i class="fa fa-user"></i> Профиль</a></li>
 								<li><a href="<?php echo PANEL_HOME?>profile/settings"><i class="fa fa-cog"></i> Настройки</a></li>
