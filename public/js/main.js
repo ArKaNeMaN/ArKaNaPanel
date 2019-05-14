@@ -47,7 +47,7 @@
 		},
 		sendRequest: (request, action, data = {}, successFunc = () => {}, errorFunc = () => {}, onlyOneRequest = false, additionalParams = {}) => {
 			if(onlyOneRequest && $.ap.isRequestProc){
-				iziToast.info({title: 'Обрабатываетсядругой запрос. Попробуйте позже'});
+				iziToast.info({title: 'Обрабатывается другой запрос. Попробуйте позже'});
 				return false;
 			}
 			var ajaxParams = {
@@ -82,6 +82,46 @@
 			$.ap.addGetParam('p', page);
 			return page;
 		},
+		showConfirmModal: (text, btns) => {
+			var time = parseInt(new Date().getTime()/1000);
+			$('body').append('<div id="apConfirmModal-'+time+'"></div>');
+			var modal = $('#apConfirmModal-'+time);
+			modal.iziModal({
+				headerColor: 'rgb(20, 20, 20)',
+				background: 'rgb(30, 30, 30)',
+				theme: 'dark',
+				width: 600,
+				icon: 'fa fa-check',
+				padding: 20,
+				radius: 5,
+				title: 'Подтверждение',
+				subtitle: 'Подтвердите дейстиве',
+			});
+			modal.iziModal('setContent', '\
+				<table>\
+					<tr>\
+						<td>'+text+'</td>\
+					</tr>\
+					<tr>\
+						<td>\
+							<button id="agree" class="styler">'+btns.agree.text+'</button>\
+							<button style="float: right;" id="disagree" class="styler">'+btns.disagree.text+'</button>\
+						</td>\
+					</tr>\
+				</table>\
+			');
+			$('#apConfirmModal-'+time+' #agree').click(() => {
+				modal.iziModal('close');
+				btns.agree.func();
+				setTimeout(() => {modal.iziModal('destroy');}, 500);
+			});
+			$('#apConfirmModal-'+time+' #disagree').click(() => {
+				modal.iziModal('close');
+				btns.disagree.func();
+				setTimeout(() => {modal.iziModal('destroy');}, 500);
+			});
+			modal.iziModal('open');
+		}
 	};
 	
 	$.fn.apPagination = function(page, total, click = '$.ap.changePage'){
