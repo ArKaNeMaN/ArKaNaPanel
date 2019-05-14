@@ -179,6 +179,7 @@
 		
 		public function getBlocks(){
 			$res = $this->sql->select('blocks', '*');
+			if(!$res) return [];
 			for($i = 0; $i < count($res); $i++){
 				$res[$i]['dataList'] = json_decode($res[$i]['dataList'], true);
 				$res[$i]['places'] = json_decode($res[$i]['places'], true);
