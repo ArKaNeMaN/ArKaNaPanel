@@ -600,23 +600,29 @@
 		}
 		
 		public function addUserGroup($name, $access){
-			return $this->sql->insert('groups', ['name' => $name, 'accessLevel' => $access]);
+			$id = $this->sql->insert('groups', ['name' => $name, 'accessLevel' => $access]);
+			if(!$id) return false;
+			$this->addLog(__CLASS__, __FUNCTION__, 'Добавлена группа '.$name.' с ID '.$id, ['id' => $id, 'name' => $name, 'accessLevel' => $access]);
+			return $id;
 		}
 		
 		public function editUserGroup($id, $name, $access, &$err = 0){
 			if(!$this->isUserGroupExists($id, $err)) return false;
+			$this->addLog(__CLASS__, __FUNCTION__, 'Изменена группа с ID '.$id, ['id' => $id, 'name' => $name, 'accessLevel' => $access]);
 			return $this->sql->update('groups', ['name' => $name, 'accessLevel' => $access], ['id' => $id]);
 		}
 		
 		public function editUserGroupData($id, $module, $data, &$err = 0){
 			if(!$this->isUserGroupExists($id, $err)) return false;
 			$old = json_decode($this->getUserGroup($id)['data']);
+			$this->addLog(__CLASS__, __FUNCTION__, 'Изменена доп. информация о группе с ID '.$id, ['group' => $id, 'module' => $module, 'data' => $data]);
 			$old[$module] = array_merge_recursive($old[$module], $data);
 			return $this->sql->update('groups', ['data' => $data_], ['id' => $id]);
 		}
 		
 		public function delUserGroup($id, &$err = 0){
 			if(!$this->isUserGroupExists($id, $err)) return false;
+			$this->addLog(__CLASS__, __FUNCTION__, 'Удалена группа с ID '.$id, $this->getUserGroup($id));
 			return $this->sql->delete('groups', ['id' => $id]);
 		}
 		
@@ -1055,6 +1061,7 @@
 		//--------------------| Логи |--------------------//
 		
 		public function addLog($module, $type, $text, $data = []){
+			if($module == 'engine') $module = 'core';
 			return $this->sql->insert('logs', [
 				'userid' => $this->userid,
 				'module' => $module,
