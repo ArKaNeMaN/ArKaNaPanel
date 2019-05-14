@@ -150,72 +150,52 @@ function deleteMenuItem(id){
 }
 
 function clickAddMenuItem(){
-	if(!isRequestProc){
-		$('.adminMenu').waitMe({
-			effect: 'stretch',
-			bg: 'rgba(30, 30, 30, .5)',
-			color: 'rgba(100, 100, 100, .8)'
-		});
-		isRequestProc = true;
-		$.ajax({
-			url: window.panelHome+'request/adminMenu.php?action=addMenuItem',
-			dataType: 'json',
-			type: 'POST',
-			success: function(res){
-				isRequestProc = false;
-				$('.adminMenu').waitMe('hide');
-				if(res instanceof Object){
-					if(res.status){
-						reloadMenuItemsList();
-						iziToast.success({title: res.msg});
-						setTimeout(function(){adminMenuEdit(res.data.id);}, 500);
-					}
-					else iziToast.error({title: res.msg});
+	var req = $.ap.sendRequest(
+		'adminMenu', 'addMenuItem', {},
+		(res) => {
+			$('.adminMenu').waitMe('hide');
+			if(res instanceof Object){
+				if(res.status){
+					reloadMenuItemsList();
+					iziToast.success({title: res.msg});
+					setTimeout(function(){adminMenuEdit(res.data.id);}, 500);
 				}
-				else{
-					console.log(res);
-					iziToast.error({title: 'Возникла непредвиденная ошибка'});
-				}
-			},
-			timeout: 5000,
-			error: function(jqXHR, status, errorThrown){
-				$('.adminMenu').waitMe('hide');
-				isRequestProc = false;
-				alert('Ошибка! '+status+': '+errorThrown);
+				else iziToast.error({title: res.msg});
 			}
-		});
-	}
+			else{
+				console.log(res);
+				iziToast.error({title: 'Возникла непредвиденная ошибка'});
+			}
+		},
+		() => {$('.adminMenu').waitMe('hide');},
+		true
+	);
+	if(req) $('.adminMenu').waitMe({
+		effect: 'stretch',
+		bg: 'rgba(30, 30, 30, .5)',
+		color: 'rgba(100, 100, 100, .8)'
+	});
 }
 
 function reloadMenuItemsList(){
-	if(!isRequestProc){
-		$('.adminMenu').waitMe({
-			effect: 'stretch',
-			bg: 'rgba(30, 30, 30, .5)',
-			color: 'rgba(100, 100, 100, .8)'
-		});
-		isRequestProc = true;
-		$.ajax({
-			url: window.panelHome+'request/adminMenu.php?action=getMenuItems',
-			dataType: 'json',
-			type: 'POST',
-			success: function(res){
-				isRequestProc = false;
-				$('.adminMenu').waitMe('hide');
+	var req = $.ap.sendRequest(
+		'adminMenu', 'getMenuItems', {},
+		(res) => {
+			$('.adminMenu').waitMe('hide');
 				if(res instanceof Array) menuItemsTpl(res);
 				else{
 					console.log(res);
 					iziToast.error({title: 'Возникла непредвиденная ошибка'});
 				}
-			},
-			timeout: 5000,
-			error: function(jqXHR, status, errorThrown){
-				$('.adminMenu').waitMe('hide');
-				isRequestProc = false;
-				alert('Ошибка! '+status+': '+errorThrown);
-			}
-		});
-	}
+		},
+		() => {$('.adminMenu').waitMe('hide');},
+		true
+	);
+	if(req) $('.adminMenu').waitMe({
+		effect: 'stretch',
+		bg: 'rgba(30, 30, 30, .5)',
+		color: 'rgba(100, 100, 100, .8)'
+	});
 }
 
 function menuItemsTpl(data){
