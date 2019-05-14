@@ -27,10 +27,9 @@
 </h3>
 <table>
 	<thead>
+		<th>ID</th>
 		<th>Название</th>
 		<th>Модуль</th>
-		<th>ID</th>
-		<th>Тип</th>
 		<th>Действия</th>
 	</thead>
 	<tbody id="allBlocksList"></tbody>
