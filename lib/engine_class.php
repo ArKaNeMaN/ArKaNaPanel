@@ -780,7 +780,7 @@
 		
 		public function editMenuItem($id, $data, $more = false){ // Изменение информации о пункте меню
 			
-			if($data['parent'] > 0) if($this->getMenuItem($data['parent'])['submenu'] == false) return $more ? ['status' => false, 'msg' => 'Ошибка! ID родителя указан неверно'] : false;
+			if($data['parent'] > 0) if(!$this->getMenuItem($data['parent'])['submenu']) return $more ? ['status' => false, 'msg' => 'Ошибка! ID родителя указан неверно'] : false;
 			
 			$sendData = [
 				'id' => (int) $data['id'],
@@ -788,9 +788,9 @@
 				'name' => $data['name'],
 				'link' => $data['link'],
 				'parent' => (int) $data['parent'],
-				'submenu' => (bool) $data['submenu'],
+				'submenu' => (int) (bool) $data['submenu'],
 				'group' => (int) $data['access'],
-				'active' => (bool) $data['active'],
+				'active' => (int) (bool) $data['active'],
 			];
 			
 			$this->sql->update('menu', $sendData, ['id' => $id]);
