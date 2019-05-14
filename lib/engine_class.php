@@ -355,6 +355,8 @@
 		
 		public function userReg($data, $more = false){ // Регистрация нового пользователя
 			
+			$this->callForward('pre_prepareUserReg', $data);
+			
 			if($this->settings['core']['captchaPubKey'] && $this->settings['core']['captchaSecKey']){
 				$reCap = $this->post('https://www.google.com/recaptcha/api/siteverify', [
 					'secret' => $this->settings['core']['captchaSecKey'],
@@ -375,6 +377,8 @@
 			$check = $this->regDataCheck($data, true);
 			if(!$check['status']) return $more ? $check : false;
 			
+			$this->callForward('post_prepareUserReg', $data);
+			
 			$sendData = [
 				'login' => $data['login'],
 				'name' => $data['name'],
@@ -388,11 +392,15 @@
 			
 			if($data['email'] != '') $sendData['email'] = $data['email'];
 			
-			$data['id'] = $this->sql->insert('users', $sendData);
+			$this->callForward('pre_userReg', $sendData);
+			
+			$sendData['id'] = $this->sql->insert('users', $sendData);
 			
 			$this->userAuth($data);
 			
-			if(is_numeric($data['id']) && $data['id']) return $more ? ['status' => true, 'msg' => 'Успех! Регистрация прошла успешно', 'data' => ['userid' => $data['id']]] : true;
+			$this->callForward('post_userReg', $sendData);
+			
+			if(is_numeric($data['id']) && $data['id']) return $more ? ['status' => true, 'msg' => 'Успех! Регистрация прошла успешно', 'data' => ['userid' => $sendData['id']]] : true;
 			else return $more ? ['status' => false, 'msg' => 'Ошибка! Возникла непредвиденная ошибка'] : false;
 		}
 		
