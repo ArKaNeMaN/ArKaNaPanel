@@ -53,10 +53,9 @@ function reloadAllBlocksList(){
 					';
 					str += '\
 						<tr>\
+							<td>'+res[i].index+'</td>\
 							<td>'+res[i].name+'</td>\
 							<td>'+res[i].module+'</td>\
-							<td>'+res[i].index+'</td>\
-							<td>'+res[i].type+'</td>\
 							<td>\
 								<button class="styler" data-dropdown="#blocks_dropdownMenu-'+i+'"><i class="fa fa-angle-down"></i>\
 									<ul class="dropdown-menu dropdown-anchor-top-left dropdown-has-anchor blocksActionsMenu" id="blocks_dropdownMenu-'+i+'">\
@@ -254,19 +253,30 @@ function changeBlockPos(id, pos){
 }
 
 function delBlock(id){
-	var req = $.ap.sendRequest(
-		'adminBlocks', 'del',
-		{id: id},
-		(res) => {
-			$('#allBlocksList').waitMe('hide');
-			if(res){
-				reloadAllBlocksList();
-				iziToast.success({title: 'Успех! Блок удалён'});
-			}
-			else iziToast.error({title: 'Ошибка удаления блока'});
+	$.ap.showConfirmModal('Вы действительно хотите удалить блок?', {
+		agree: {
+			text: '<b><i class="fa fa-check"></i> Да</b>',
+			func: () => {
+				var req = $.ap.sendRequest(
+					'adminBlocks', 'del',
+					{id: id},
+					(res) => {
+						$('#allBlocksList').waitMe('hide');
+						if(res){
+							reloadAllBlocksList();
+							iziToast.success({title: 'Успех! Блок удалён'});
+						}
+						else iziToast.error({title: 'Ошибка удаления блока'});
+					},
+					() => {}, true
+				);
+			},
 		},
-		() => {}, true
-	);
+		disagree: {
+			text: '<b style="color: red;"><i class="fa fa-times"></i> Нет</b>',
+			func: () => {},
+		},
+	});
 }
 
 function importAllBlocks(){
