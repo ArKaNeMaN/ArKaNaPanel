@@ -768,7 +768,7 @@
 			if($data == null){
 				$sendData = [
 					'name' => 'Новый пункт',
-					'active' => false,
+					'active' => 0,
 				];
 			}
 			else $sendData = $data;
